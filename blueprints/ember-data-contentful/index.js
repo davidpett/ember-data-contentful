@@ -12,7 +12,10 @@ module.exports = {
     var contentfulSpace = options.contentfulSpace || 'YOUR-CONTENTFUL-SPACE';
     var contentfulAccessToken = options.contentfulAccessToken || 'YOUR-CONTENTFUL-ACCESS-TOKEN';
 
-    return self.addToConfig('contentfulSpace', '\'' + contentfulSpace + '\'')
+    return this.addAddonToProject('ember-network', '0.2.0')
+    .then(function() {
+      return self.addToConfig('contentfulSpace', '\'' + contentfulSpace + '\'');
+    })
     .then(function () {
       return self.addToConfig('contentfulAccessToken', '\'' + contentfulAccessToken + '\'');
     })
