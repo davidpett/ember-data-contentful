@@ -8,24 +8,24 @@ var readFile    = Promise.denodeify(fs.readFile);
 
 module.exports = {
   description: 'ember-data-contentful',
-  
+
   normalizeEntityName: function() {
   },
 
   availableOptions: [
     {
-      name: 'contentfulSpace',
+      name: 'space',
       type: String
     }, {
-      name: 'contentfulAccessToken',
+      name: 'accesstoken',
       type: String
     }
   ],
 
   afterInstall: function(options) {
     var self = this;
-    var contentfulSpace = options.contentfulSpace || 'YOUR-CONTENTFUL-SPACE';
-    var contentfulAccessToken = options.contentfulAccessToken || 'YOUR-CONTENTFUL-ACCESS-TOKEN';
+    var contentfulSpace = options.space || 'YOUR-CONTENTFUL-SPACE';
+    var contentfulAccessToken = options.accesstoken || 'YOUR-CONTENTFUL-ACCESS-TOKEN';
 
     return this.addAddonToProject('ember-network', '0.2.0')
     .then(function() {
