@@ -7,6 +7,21 @@ var Promise     = require('rsvp');
 var readFile    = Promise.denodeify(fs.readFile);
 
 module.exports = {
+  description: 'ember-data-contentful',
+  
+  normalizeEntityName: function() {
+  },
+
+  availableOptions: [
+    {
+      name: 'contentfulSpace',
+      type: String
+    }, {
+      name: 'contentfulAccessToken',
+      type: String
+    }
+  ],
+
   afterInstall: function(options) {
     var self = this;
     var contentfulSpace = options.contentfulSpace || 'YOUR-CONTENTFUL-SPACE';
@@ -21,7 +36,7 @@ module.exports = {
     })
     .then(function () {
       var output = EOL;
-      output += chalk.yellow('Ember Data Contentful') + ' has been installed. Please configure your contentful space and accessToekn in ' + chalk.green('config/environment.js') + EOL;
+      output += chalk.yellow('ember-data-contentful') + ' has been installed. Please configure your contentful space and accessToekn in ' + chalk.green('config/environment.js') + EOL;
       console.log(output);
     });
   },
