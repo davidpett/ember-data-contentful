@@ -1,6 +1,9 @@
 # Ember-data-contentful
 
-This README outlines the details of collaborating on this Ember addon.
+
+
+
+In order to contribute to this addon, follow these steps:
 
 ## Installation
 

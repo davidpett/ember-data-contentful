@@ -1,7 +1,7 @@
 {
   "name": "ember-data-contentful",
-  "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "version": "0.1.0",
+  "description": "Retrieve data from contentful.com Content Delivery API",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -11,11 +11,13 @@
     "start": "ember server",
     "test": "ember try:testall"
   },
-  "repository": "",
+  "repository": "https://github.com/davidpett/ember-data-contentful",
+  "bugs": "https://github.com/davidpett/ember-data-contentful/issues",
+  "homepage": "https://github.com/davidpett/ember-data-contentful",
   "engines": {
     "node": ">= 0.10.0"
   },
-  "author": "",
+  "author": "David Pett",
   "license": "MIT",
   "devDependencies": {
     "broccoli-asset-rev": "^2.2.0",
@@ -40,10 +42,19 @@
     "loader.js": "^4.0.0"
   },
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "adapter",
+    "serializer",
+    "contentful",
+    "ember-data"
   ],
   "dependencies": {
-    "ember-cli-babel": "^5.1.5"
+    "chalk": "1.1.0",
+    "ember-cli-babel": "^5.1.5",
+    "ember-get-config": "0.0.2",
+    "ember-network": "0.2.0",
+    "fs-extra": "0.22.1",
+    "rsvp": "3.0.18"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
