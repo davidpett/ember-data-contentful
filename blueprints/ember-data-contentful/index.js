@@ -7,15 +7,6 @@ var Promise     = require('rsvp');
 var readFile    = Promise.denodeify(fs.readFile);
 
 module.exports = {
-  description: ''
-
-  // locals: function(options) {
-  //   // Return custom template variables here.
-  //   return {
-  //     foo: options.entity.options.foo
-  //   };
-  // }
-
   afterInstall: function(options) {
     var self = this;
     var contentfulSpace = options.contentfulSpace || 'YOUR-CONTENTFUL-SPACE';
