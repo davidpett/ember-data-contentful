@@ -181,9 +181,9 @@ export default DS.Adapter.extend({
   _getContent(type, params) {
     let data = params || {};
     Object.assign(data, {
-      'access_token': config.contentful.accessToken
+      'access_token': config.contentfulAccessToken
     });
-    return fetch(`https://cdn.contentful.com/spaces/${config.contentful.space}/${type}?${this._serializeQueryParams(data)}`, {
+    return fetch(`https://cdn.contentful.com/spaces/${config.contentfulSpace}/${type}?${this._serializeQueryParams(data)}`, {
       headers: {
         'Accept': 'application/json; charset=utf-8'
       }
