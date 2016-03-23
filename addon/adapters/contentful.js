@@ -126,6 +126,8 @@ export default DS.Adapter.extend({
     @public
   */
   query(store, type, query) {
+    query = query || {};
+    query['content_type'] = type;
     return this._getContent('entries', query);
   },
 
@@ -147,6 +149,8 @@ export default DS.Adapter.extend({
     @public
   */
   queryRecord(store, type, query) {
+    query = query || {};
+    query['content_type'] = type;
     return this._getContent('entries', query);
   },
 

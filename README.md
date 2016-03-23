@@ -1,29 +1,44 @@
-# Ember-data-contentful
+# ember-data-contentful
 
+This is an Ember Data adapter/serializer that uses the **READ ONLY** Content Delivery API from [contentful](http://contentful.com)
 
+## Setup in your app
+```
+ember install ember-data-contentful
+```
 
+After installing the addon, configure your Contentful Space ID and Access Token in `config/environment.js`:
+```
+contentfulSpace: 'YOUR-CONTENTFUL-SPACE',
+contentfulAccessToken: 'YOUR-CONTENTFUL-ACCESS-TOKEN'
+```
+Once you have configured this, you can use the normal Ember Data requests of `findRecord`, `findAll`, `queryRecord`, and `query`. For example:
+```
+model() {
+  return this.store.findAll('project');
+}
+```
+or
+```
+model(params) {
+  return this.store.findRecord('project', params.project_id);
+}
+```
 
-In order to contribute to this addon, follow these steps:
+If you want to use pretty urls and the `slug` field in contentful, you can make your query like so:
+```
+model(params) {
+  return this.store.queryRecord('page', {
+    'fields.slug': params.page_slug
+  });
+},
+serialize(model) {
+  return { page_slug: get(model, 'slug') };
+}
+```
+and ensure that you declare your route in `router.js` like this:
+```
+this.route('page', { path: ':page_slug' });
+```
 
-## Installation
-
-* `git clone` this repository
-* `npm install`
-* `bower install`
-
-## Running
-
-* `ember server`
-* Visit your app at http://localhost:4200.
-
-## Running Tests
-
-* `npm test` (Runs `ember try:testall` to test your addon against multiple Ember versions)
-* `ember test`
-* `ember test --server`
-
-## Building
-
-* `ember build`
-
-For more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).
+For more information on the contentful Content Delivery API and the available queries, look here: https://www.contentful.com/developers/docs/references/content-delivery-api/
