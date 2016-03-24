@@ -36,7 +36,7 @@ module.exports = {
     })
     .then(function () {
       var output = EOL;
-      output += chalk.yellow('ember-data-contentful') + ' has been installed. Please configure your contentful space and accessToekn in ' + chalk.green('config/environment.js') + EOL;
+      output += chalk.yellow('ember-data-contentful') + ' has been installed. Please configure your contentful space and accessToken in ' + chalk.green('config/environment.js') + EOL;
       console.log(output);
     });
   },
