@@ -1,3 +1,4 @@
+[![Ember Observer Score](http://emberobserver.com/badges/ember-data-contentful.svg)](http://emberobserver.com/addons/ember-data-contentful)
 # ember-data-contentful
 
 This is an Ember Data adapter/serializer that uses the **READ ONLY** Content Delivery API from [contentful](http://contentful.com)
