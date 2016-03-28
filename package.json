@@ -13,7 +13,7 @@
   },
   "repository": "https://github.com/davidpett/ember-data-contentful",
   "bugs": "https://github.com/davidpett/ember-data-contentful/issues",
-  "homepage": "https://github.com/davidpett/ember-data-contentful",
+  "homepage": "http://davidpett.github.io/ember-data-contentful/",
   "engines": {
     "node": ">= 0.10.0"
   },
@@ -58,6 +58,7 @@
     "rsvp": "3.0.18"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "demoURL": "http://davidpett.github.io/ember-data-contentful/"
   }
 }
