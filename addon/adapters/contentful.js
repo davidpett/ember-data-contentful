@@ -170,7 +170,7 @@ export default DS.Adapter.extend({
         str.push(`${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`);
       }
     }
-    return str.join('&');
+    return str.length ? `?${str.join('&')}` : '';
   },
 
   /**
@@ -187,7 +187,7 @@ export default DS.Adapter.extend({
     Object.assign(data, {
       'access_token': config.contentfulAccessToken
     });
-    return fetch(`https://cdn.contentful.com/spaces/${config.contentfulSpace}/${type}?${this._serializeQueryParams(data)}`, {
+    return fetch(`https://cdn.contentful.com/spaces/${config.contentfulSpace}/${type}/${this._serializeQueryParams(data)}`, {
       headers: {
         'Accept': 'application/json; charset=utf-8'
       }
