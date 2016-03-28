@@ -1,0 +1,11 @@
+<h1>{{model.title}}</h1>
+<h2>by {{#each model.author as |author|}}{{author.name}}{{/each}}</h2>
+
+{{#if model.featuredImage}}
+  <img src="{{model.featuredImage.file.url}}" alt="" />
+{{/if}}
+<div>
+  {{model.body}}
+</div>
+
+{{link-to 'All Posts' 'posts'}}
