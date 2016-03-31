@@ -1,6 +1,6 @@
 {
   "name": "ember-data-contentful",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Retrieve data from contentful.com Content Delivery API",
   "directories": {
     "doc": "doc",
