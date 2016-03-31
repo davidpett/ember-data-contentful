@@ -1,7 +1,8 @@
 [![Build Status](https://travis-ci.org/davidpett/ember-data-contentful.svg?branch=master)](https://travis-ci.org/davidpett/ember-data-contentful)
 [![npm version](https://badge.fury.io/js/ember-data-contentful.svg)](https://badge.fury.io/js/ember-data-contentful)
 [![Ember Observer Score](http://emberobserver.com/badges/ember-data-contentful.svg)](http://emberobserver.com/addons/ember-data-contentful)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+[![FastBoot Ready](https://img.shields.io/badge/FastBoot-ready-brightgreen.svg)](http://ember-fastboot.com)
 # ember-data-contentful
 
 This is an Ember Data adapter/serializer that uses the **READ ONLY** Content Delivery API from [contentful](http://contentful.com)
