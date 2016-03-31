@@ -14,8 +14,10 @@ ember install ember-data-contentful
 
 After installing the addon, configure your Contentful Space ID and Access Token in `config/environment.js`:
 ```
-contentfulSpace: 'YOUR-CONTENTFUL-SPACE',
-contentfulAccessToken: 'YOUR-CONTENTFUL-ACCESS-TOKEN'
+contentful: {
+  space: 'YOUR-CONTENTFUL-SPACE',
+  accessToken: 'YOUR-CONTENTFUL-ACCESS-TOKEN'
+}
 ```
 Once you have configured this, you can use the normal Ember Data requests of `findRecord`, `findAll`, `queryRecord`, and `query`. For example:
 ```
