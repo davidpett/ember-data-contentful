@@ -8,6 +8,15 @@ module.exports = function(environment) {
     locationType: 'auto',
     contentfulSpace: '10uc2hqlkgax',
     contentfulAccessToken: 'cc086951ba89c5a39204506474a75446d1b7a6d418d3190cc77fa96bd91e0d82',
+    metricsAdapters: [
+      {
+        name: 'GoogleAnalytics',
+        environments: ['all'],
+        config: {
+          id: 'UA-2516077-7'
+        }
+      }
+    ],
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
