@@ -42,13 +42,15 @@ export default DS.JSONSerializer.extend({
 
         return relationshipHash;
       } else {
-        let data = {
-          id: relationshipHash.sys.id,
-          type: modelClass.modelName,
-          attributes: this.extractAttributes(modelClass, relationshipHash.fields, relationshipHash),
-          relationships: this.extractRelationships(modelClass, relationshipHash.fields)
-        };
-        return data;
+        if (relationshipHash.fields) {
+          let data = {
+            id: relationshipHash.sys.id,
+            type: modelClass.modelName,
+            attributes: this.extractAttributes(modelClass, relationshipHash.fields, relationshipHash),
+            relationships: this.extractRelationships(modelClass, relationshipHash.fields)
+          };
+          return data;
+        }
       }
     }
     return { id: relationshipHash.sys.id, type: relationshipModelName };
