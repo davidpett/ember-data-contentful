@@ -186,10 +186,11 @@ export default DS.Adapter.extend({
     let data = params || {};
     let accessToken = config.contentful ? config.contentful.accessToken : config.contentfulAccessToken;
     let space = config.contentful ? config.contentful.space : config.contentfulSpace;
+    let api = config.contentful.previewApi ? 'preview' : 'cdn';
     Object.assign(data, {
       'access_token': accessToken
     });
-    return fetch(`https://cdn.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
+    return fetch(`https://${api}.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
       headers: {
         'Accept': 'application/json; charset=utf-8'
       }
