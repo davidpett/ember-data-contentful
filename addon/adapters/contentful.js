@@ -186,6 +186,15 @@ export default DS.Adapter.extend({
     let data = params || {};
     let accessToken = config.contentful ? config.contentful.accessToken : config.contentfulAccessToken;
     let space = config.contentful ? config.contentful.space : config.contentfulSpace;
+
+    if (config.contentfulAccessToken || config.contentfulSpace) {
+      console.warn(`DEPRECATION: Use of 'contentfulAccessToken' and 'contentfulSpace' will be removed in ember-data-contentful@1.0.0. please migrate to the contentful object syntax:
+      contentful: {
+        accessToken: '${accessToken}',
+        space: '${space}'
+      }`);
+    }
+
     Object.assign(data, {
       'access_token': accessToken
     });
