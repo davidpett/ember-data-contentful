@@ -186,7 +186,7 @@ export default DS.Adapter.extend({
     let data = params || {};
     let accessToken = config.contentful ? config.contentful.accessToken : config.contentfulAccessToken;
     let space = config.contentful ? config.contentful.space : config.contentfulSpace;
-    let api = ((config.contentful && config.contentful.previewApi) || config.contentfulpreviewApi) ? 'preview' : 'cdn';
+    let api = ((config.contentful && config.contentful.previewApi) || config.contentfulPreviewApi) ? 'preview' : 'cdn';
     Object.assign(data, {
       'access_token': accessToken
     });
