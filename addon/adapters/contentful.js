@@ -1,8 +1,24 @@
 import DS from 'ember-data';
+import Ember from 'ember';
 import config from 'ember-get-config';
 import fetch from 'ember-network/fetch';
+import injectService from 'ember-service/inject';
+
+const {
+  computed: { readOnly },
+  get
+} = Ember;
 
 export default DS.Adapter.extend({
+  contentful: injectService(),
+
+  /**
+    @property usePreviewApi
+    @type {boolean}
+    @public
+  */
+  usePreviewApi: readOnly('contentful.usePreviewApi'),
+
   /**
     @property coalesceFindRequests
     @type {boolean}
@@ -184,8 +200,19 @@ export default DS.Adapter.extend({
   */
   _getContent(type, params) {
     let data = params || {};
+    let api = 'cdn';
     let accessToken = config.contentful ? config.contentful.accessToken : config.contentfulAccessToken;
     let space = config.contentful ? config.contentful.space : config.contentfulSpace;
+
+    if (get(this, 'usePreviewApi')) {
+      let previewAccessToken = config.contentful ? config.contentful.previewAccessToken : config.contentfulPreviewAccessToken;
+      if (!previewAccessToken) {
+        console.warn('You have specified to use the Contentful Preview API; However, no `previewAccessToken` has been specified in config/environment.js');
+      } else {
+        accessToken = previewAccessToken;
+        api = 'preview';
+      }
+    }
 
     if (config.contentfulAccessToken || config.contentfulSpace) {
       console.warn(`DEPRECATION: Use of 'contentfulAccessToken' and 'contentfulSpace' will be removed in ember-data-contentful@1.0.0. please migrate to the contentful object syntax:
@@ -198,7 +225,7 @@ export default DS.Adapter.extend({
     Object.assign(data, {
       'access_token': accessToken
     });
-    return fetch(`https://cdn.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
+    return fetch(`https://${api}.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
       headers: {
         'Accept': 'application/json; charset=utf-8'
       }
