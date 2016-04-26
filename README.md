@@ -16,9 +16,12 @@ After installing the addon, configure your Contentful Space ID and Access Token 
 ```
 contentful: {
   space: 'YOUR-CONTENTFUL-SPACE',
-  accessToken: 'YOUR-CONTENTFUL-ACCESS-TOKEN'
+  accessToken: 'YOUR-CONTENTFUL-ACCESS-TOKEN',
+  previewAccessToken: 'YOUR-CONTENTFUL-PREVIEW-ACCESS-TOKEN',
+  usePreviewApi: false
 }
 ```
+
 Once you have configured this, you can use the normal Ember Data requests of `findRecord`, `findAll`, `queryRecord`, and `query`. For example:
 ```
 model() {

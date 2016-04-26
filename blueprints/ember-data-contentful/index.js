@@ -13,7 +13,7 @@ module.exports = {
     return this.addAddonToProject('ember-network', '0.2.0')
     .then(function () {
       var output = EOL;
-      output += chalk.yellow('ember-data-contentful') + ' has been installed. Please configure your contentful space and accessToken in ' + chalk.green('config/environment.js') + EOL;
+      output += chalk.yellow('ember-data-contentful') + ' has been installed. Please configure your contentful space and accessTokens in ' + chalk.green('config/environment.js') + EOL;
       console.log(output);
     });
   }
