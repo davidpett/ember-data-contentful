@@ -65,7 +65,7 @@ export default DS.Adapter.extend({
     @public
   */
   findRecord(store, type, id) {
-    if (type.modelName === 'asset') {
+    if (type.modelName === 'asset' || type.modelName === 'contentful-asset') {
       return this._getContent(`assets/${id}`);
     }
     return this._getContent(`entries/${id}`);
@@ -85,7 +85,7 @@ export default DS.Adapter.extend({
     @public
   */
   findMany(store, type, ids) {
-    if (type.modelName === 'asset') {
+    if (type.modelName === 'asset' || type.modelName === 'contentful-asset') {
       return this._getContent('assets', { 'sys.id[in]': ids.toString() });
     }
     return this._getContent('entries', { 'sys.id[in]': ids.toString() });

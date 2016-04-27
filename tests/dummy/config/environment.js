@@ -10,7 +10,7 @@ module.exports = function(environment) {
       space: '10uc2hqlkgax',
       accessToken: 'cc086951ba89c5a39204506474a75446d1b7a6d418d3190cc77fa96bd91e0d82',
       previewAccessToken: '264e7e2fd47c6423ee45b54c0112a8a72d02de3d7a6e5cbb28ab0eee4da0673a',
-      usePreviewApi: true
+      usePreviewApi: false
     },
     metricsAdapters: [
       {

@@ -8,18 +8,23 @@ const {
 } = Ember;
 
 export default DS.JSONSerializer.extend({
-  extractAttributes(modelClass, objHash) {
+  extractAttributes(modelClass, fieldsHash, objHash) {
     let attributeKey;
     let attributes = {};
 
     modelClass.eachAttribute((key) => {
       attributeKey = this.keyForAttribute(key, 'deserialize');
-      if (objHash && objHash.hasOwnProperty(attributeKey)) {
-        let attributeValue = objHash[attributeKey];
-        if (typeOf(attributeValue) === 'object' && modelClass.modelName !== 'asset') {
+      if (fieldsHash && fieldsHash.hasOwnProperty(attributeKey)) {
+        let attributeValue = fieldsHash[attributeKey];
+        if (typeOf(attributeValue) === 'object' && objHash.sys.type !== 'Asset') {
           attributeValue = attributeValue.sys.id;
         }
         attributes[key] = attributeValue;
+      }
+      if (objHash) {
+        attributes['contentType'] = objHash.sys.type === 'Asset' ? 'asset' : objHash.sys.contentType.sys.id;
+        attributes['createdAt'] = objHash.sys.createdAt;
+        attributes['updatedAt'] = objHash.sys.updatedAt;
       }
     });
     return attributes;

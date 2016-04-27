@@ -1,16 +1,12 @@
-import DS from 'ember-data';
+import Contentful from 'ember-data-contentful/models/contentful';
+import attr from 'ember-data/attr';
+import { belongsTo, hasMany } from 'ember-data/relationships';
 
-const {
-  attr,
-  belongsTo,
-  hasMany
-} = DS;
-
-export default DS.Model.extend({
+export default Contentful.extend({
   author: hasMany('author'),
   body: attr('string'),
   date: attr('date'),
-  featuredImage: belongsTo('asset'),
+  featuredImage: belongsTo('contentful-asset'),
   slug: attr('string'),
   title: attr('string')
 });
