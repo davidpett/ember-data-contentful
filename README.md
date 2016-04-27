@@ -22,7 +22,18 @@ contentful: {
 }
 ```
 
-Once you have configured this, you can use the normal Ember Data requests of `findRecord`, `findAll`, `queryRecord`, and `query`. For example:
+### Contentful models
+Included are a few models to help with some of the default fields
+
+```
+import Contentful from 'ember-data-contentful/models/contentful';
+```
+will give you the default fields of `contentType`, `createdAt`, and `updatedAt`.
+
+For any relationship property that is a Contentful Asset (image or other media file), use the `contentful-asset` model. i.e. `image: belongsTo('contentful-asset')` in order to get the asset correctly.
+
+## Usage
+Once you have configured your tokens and created your models, you can use the normal Ember Data requests of `findRecord`, `findAll`, `queryRecord`, and `query`. For example:
 ```
 model() {
   return this.store.findAll('project');
@@ -50,5 +61,8 @@ and ensure that you declare your route in `router.js` like this:
 ```
 this.route('page', { path: ':page_slug' });
 ```
+
+## Previewing Content
+Contentful provides a [Preview API](https://www.contentful.com/developers/docs/references/content-preview-api/) that allows you to preview unpublished content. In order to enable this, ensure you have your `previewAccessToken` configured in `config/environment.js` and enable the `usePreviewApi` property.
 
 For more information on the contentful Content Delivery API and the available queries, look here: https://www.contentful.com/developers/docs/references/content-delivery-api/
