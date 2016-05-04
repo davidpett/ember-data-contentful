@@ -24,9 +24,21 @@ export default DS.Adapter.extend({
     see https://www.contentful.com/developers/docs/references/content-management-api/
 
     @method createRecord
+    @param {DS.Store} store
+    @param {DS.Model} type
+    @param {DS.Snapshot} snapshot
+    @return {Promise} promise
     @public
   */
-  createRecord: null,
+  createRecord(store, type, snapshot) {
+    let data = {};
+    let serializer = store.serializerFor(type.modelName);
+    // let url = this.buildURL(type.modelName, null, snapshot, 'createRecord');
+
+    serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
+
+    return this._setContent('create', type, { data });
+  },
 
   /**
     Currently not implemented as this is adapter only implements the
@@ -35,9 +47,23 @@ export default DS.Adapter.extend({
     see https://www.contentful.com/developers/docs/references/content-management-api/
 
     @method updateRecord
+    @param {DS.Store} store
+    @param {DS.Model} type
+    @param {DS.Snapshot} snapshot
+    @return {Promise} promise
     @public
   */
-  updateRecord: null,
+  updateRecord(store, type, snapshot) {
+    let data = {};
+    let serializer = store.serializerFor(type.modelName);
+
+    serializer.serializeIntoHash(data, type, snapshot);
+
+    // let id = snapshot.id;
+    // let url = this.buildURL(type.modelName, id, snapshot, 'updateRecord');
+
+    return this._setContent('update', type, { data });
+  },
 
   /**
     Currently not implemented as this is adapter only implements the
@@ -46,9 +72,17 @@ export default DS.Adapter.extend({
     see https://www.contentful.com/developers/docs/references/content-management-api/
 
     @method deleteRecord
+    @param {DS.Store} store
+    @param {DS.Model} type
+    @param {DS.Snapshot} snapshot
+    @return {Promise} promise
     @public
   */
-  deleteRecord: null,
+  deleteRecord(store, type, snapshot) {
+    let id = snapshot.id;
+
+    return this._setContent('delete', type, id);
+  },
 
   /**
     Called by the store in order to fetch the JSON for a given

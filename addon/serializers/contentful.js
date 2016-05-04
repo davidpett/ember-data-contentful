@@ -96,6 +96,12 @@ export default DS.JSONSerializer.extend({
         return this.normalizeFindManyResponse(...arguments);
       case 'query':
         return this.normalizeQueryResponse(...arguments);
+      case 'createRecord':
+        return this.normalizeCreateRecordResponse(...arguments);
+      case 'deleteRecord':
+        return this.normalizeDeleteRecordResponse(...arguments);
+      case 'updateRecord':
+        return this.normalizeUpdateRecordResponse(...arguments);
       default:
         return null;
     }
@@ -128,6 +134,22 @@ export default DS.JSONSerializer.extend({
 
   normalizeQueryResponse() {
     return this.normalizeArrayResponse(...arguments);
+  },
+
+  normalizeCreateRecordResponse() {
+    return this.normalizeSaveResponse(...arguments);
+  },
+
+  normalizeDeleteRecordResponse() {
+    return this.normalizeSaveResponse(...arguments);
+  },
+
+  normalizeUpdateRecordResponse() {
+    return this.normalizeSaveResponse(...arguments);
+  },
+
+  normalizeSaveResponse() {
+    return this.normalizeSingleResponse(...arguments);
   },
 
   normalizeSingleResponse() {
