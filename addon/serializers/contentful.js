@@ -12,6 +12,9 @@ export default DS.JSONSerializer.extend({
     let attributeKey;
     let attributes = {};
 
+    if (objHash.sys.type === 'Error') {
+      return {};
+    }
     modelClass.eachAttribute((key) => {
       attributeKey = this.keyForAttribute(key, 'deserialize');
       if (fieldsHash && fieldsHash.hasOwnProperty(attributeKey)) {

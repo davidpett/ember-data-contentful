@@ -65,10 +65,9 @@ export default DS.Adapter.extend({
     @public
   */
   findRecord(store, type, id) {
-    if (type.modelName === 'asset' || type.modelName === 'contentful-asset') {
-      return this._getContent(`assets/${id}`);
-    }
-    return this._getContent(`entries/${id}`);
+    let contentType = (type.modelName === 'asset' || type.modelName === 'contentful-asset') ? 'asset' : 'entries';
+
+    return this._getContent(`${contentType}/${id}`);
   },
 
   /**
@@ -85,10 +84,9 @@ export default DS.Adapter.extend({
     @public
   */
   findMany(store, type, ids) {
-    if (type.modelName === 'asset' || type.modelName === 'contentful-asset') {
-      return this._getContent('assets', { 'sys.id[in]': ids.toString() });
-    }
-    return this._getContent('entries', { 'sys.id[in]': ids.toString() });
+    let contentType = (type.modelName === 'asset' || type.modelName === 'contentful-asset') ? 'asset' : 'entries';
+
+    return this._getContent(contentType, { 'sys.id[in]': ids.toString() });
   },
 
   /**
@@ -155,6 +153,48 @@ export default DS.Adapter.extend({
   },
 
   /**
+    `_getContent` makes all requests to the contentful.com content delivery API
+
+    @method _getContent
+    @param {String} type
+    @param {Object} params
+    @return {Promise} promise
+    @private
+  */
+  _getContent(type, params) {
+    let data = params || {};
+    let {
+      accessToken,
+      api,
+      space
+    } = this._getConfig();
+
+    Object.assign(data, {
+      'access_token': accessToken
+    });
+    return fetch(`https://${api}.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
+      headers: {
+        'Accept': 'application/json; charset=utf-8'
+      }
+    }).then((response) => {
+      return response.json();
+    });
+  },
+
+  /**
+    `_setContent` makes all requests to the contentful.com content management API
+
+    @method _setContent
+    @param {String} type
+    @param {Object} params
+    @return {Promise} promise
+    @private
+  */
+  _setContent() {
+    console.warn(`The Contentful Content Management API has not yet been implemented`);
+  },
+
+  /**
     `_serializeQueryParams` is a private utility used to
     stringify the query param object to be used with the fetch API.
 
@@ -174,18 +214,15 @@ export default DS.Adapter.extend({
   },
 
   /**
-    `_getContent` makes all requests to the contentful.com content delivery API
+    `_getConfig` returns the config from your `config/environment.js`
 
-    @method _getContent
-    @param {String} type
-    @param {Object} params
-    @return {Promise} promise
+    @method _getConfig
+    @return {Object} params
     @private
   */
-  _getContent(type, params) {
-    let data = params || {};
-    let api = 'cdn';
+  _getConfig() {
     let accessToken = config.contentful ? config.contentful.accessToken : config.contentfulAccessToken;
+    let api = 'cdn';
     let space = config.contentful ? config.contentful.space : config.contentfulSpace;
     let previewAccessToken = config.contentful ? config.contentful.previewAccessToken : config.contentfulPreviewAccessToken;
 
@@ -204,16 +241,10 @@ export default DS.Adapter.extend({
         space: '${space}'
       }`);
     }
-
-    Object.assign(data, {
-      'access_token': accessToken
-    });
-    return fetch(`https://${api}.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
-      headers: {
-        'Accept': 'application/json; charset=utf-8'
-      }
-    }).then((response) => {
-      return response.json();
-    });
+    return {
+      accessToken,
+      api,
+      space
+    };
   }
 });
