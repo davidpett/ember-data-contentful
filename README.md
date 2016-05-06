@@ -23,10 +23,22 @@ contentful: {
 ```
 
 ### Contentful models
-Included are a few models to help with some of the default fields
+Included are a few models to help with some of the default fields. here is an example:
 
 ```
+// models/post.js
 import Contentful from 'ember-data-contentful/models/contentful';
+import attr from 'ember-data/attr';
+import { belongsTo, hasMany } from 'ember-data/relationships';
+
+export default Contentful.extend({
+  author: hasMany('author'),
+  body: attr('string'),
+  date: attr('date'),
+  featuredImage: belongsTo('contentful-asset'),
+  slug: attr('string'),
+  title: attr('string')
+});
 ```
 will give you the default fields of `contentType`, `createdAt`, and `updatedAt`.
 
