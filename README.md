@@ -16,9 +16,16 @@ After installing the addon, configure your Contentful Space ID and Access Token 
 ```
 contentful: {
   space: 'YOUR-CONTENTFUL-SPACE',
+
+  // For use with the Content Delivery API
   accessToken: 'YOUR-CONTENTFUL-ACCESS-TOKEN',
   previewAccessToken: 'YOUR-CONTENTFUL-PREVIEW-ACCESS-TOKEN',
-  usePreviewApi: false
+  usePreviewApi: false,
+
+  // For use with the Content Management API
+  clientId: 'YOUR-CONTENTFUL-CLIENT-ID',
+  redirectUri: 'YOUR-CONTENTFUL-REDIRECT-URI',
+  scope: 'content_management_manage'
 }
 ```
 

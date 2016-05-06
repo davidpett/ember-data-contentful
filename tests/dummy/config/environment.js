@@ -8,9 +8,21 @@ module.exports = function(environment) {
     locationType: 'auto',
     contentful: {
       space: '10uc2hqlkgax',
+
+      // For use with the Content Delivery API
       accessToken: 'cc086951ba89c5a39204506474a75446d1b7a6d418d3190cc77fa96bd91e0d82',
       previewAccessToken: '264e7e2fd47c6423ee45b54c0112a8a72d02de3d7a6e5cbb28ab0eee4da0673a',
-      usePreviewApi: false
+      usePreviewApi: false,
+
+      // For use with the Content Management API
+      clientId: 'YOUR-CONTENTFUL-CLIENT-ID',
+      redirectUri: 'YOUR-CONTENTFUL-REDIRECT-URI',
+      scope: 'content_management_manage'
+    },
+    torii: {
+      providers: {
+        'contentful-oauth2': {}
+      }
     },
     metricsAdapters: [
       {

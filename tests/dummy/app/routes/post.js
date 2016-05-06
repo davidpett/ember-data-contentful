@@ -1,7 +1,8 @@
 import Ember from 'ember';
 
 const {
-  get
+  get,
+  set
 } = Ember;
 
 export default Ember.Route.extend({
@@ -13,4 +14,11 @@ export default Ember.Route.extend({
   serialize(model) {
     return { post_slug: get(model, 'slug') };
   },
+
+  actions: {
+    changeContent(mod) {
+      set(mod, 'body', 'fooooooooooo');
+      mod.save();
+    }
+  }
 });

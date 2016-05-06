@@ -1,8 +1,16 @@
 import DS from 'ember-data';
+import Ember from 'ember';
 import config from 'ember-get-config';
 import fetch from 'ember-network/fetch';
+import injectService from 'ember-service/inject';
+
+const {
+  get
+} = Ember;
 
 export default DS.Adapter.extend({
+  torii: injectService(),
+
   /**
     @property coalesceFindRequests
     @type {boolean}
@@ -56,13 +64,13 @@ export default DS.Adapter.extend({
   updateRecord(store, type, snapshot) {
     let data = {};
     let serializer = store.serializerFor(type.modelName);
+    let id = snapshot.id;
 
     serializer.serializeIntoHash(data, type, snapshot);
 
-    // let id = snapshot.id;
     // let url = this.buildURL(type.modelName, id, snapshot, 'updateRecord');
 
-    return this._setContent('update', type, { data });
+    return this._setContent('update', type, id, { data });
   },
 
   /**
@@ -201,7 +209,7 @@ export default DS.Adapter.extend({
       accessToken,
       api,
       space
-    } = this._getConfig();
+    } = this._getConfig('delivery');
 
     Object.assign(data, {
       'access_token': accessToken
@@ -224,8 +232,21 @@ export default DS.Adapter.extend({
     @return {Promise} promise
     @private
   */
-  _setContent() {
-    console.warn(`The Contentful Content Management API has not yet been implemented`);
+  _setContent(method, type, id, data) {
+    console.warn(`The Contentful Content Management API has not yet been fully implemented`);
+    let body = data || {};
+    let {
+      headers,
+      space
+    } = this._getConfig('management', method, type);
+
+    return fetch(`https://api.contentful.com/spaces/${space}/entries/${id}`, {
+      method,
+      body,
+      headers
+    }).then((response) => {
+      return response.json();
+    });
   },
 
   /**
@@ -251,34 +272,70 @@ export default DS.Adapter.extend({
     `_getConfig` returns the config from your `config/environment.js`
 
     @method _getConfig
+    @param {String} type
+    @param {String} method
+    @param {String} contentType
     @return {Object} params
     @private
   */
-  _getConfig() {
-    let accessToken = config.contentful ? config.contentful.accessToken : config.contentfulAccessToken;
-    let api = 'cdn';
-    let space = config.contentful ? config.contentful.space : config.contentfulSpace;
-    let previewAccessToken = config.contentful ? config.contentful.previewAccessToken : config.contentfulPreviewAccessToken;
-
-    if (config.contentful.usePreviewApi || config.contentfulUsePreviewApi) {
-      if (!previewAccessToken) {
-        console.warn('You have specified to use the Contentful Preview API; However, no `previewAccessToken` has been specified in config/environment.js');
-      } else {
-        accessToken = previewAccessToken;
-        api = 'preview';
-      }
-    }
-    if (config.contentfulAccessToken || config.contentfulSpace) {
-      console.warn(`DEPRECATION: Use of 'contentfulAccessToken' and 'contentfulSpace' will be removed in ember-data-contentful@1.0.0. please migrate to the contentful object syntax:
-      contentful: {
-        accessToken: '${accessToken}',
-        space: '${space}'
-      }`);
-    }
-    return {
+  _getConfig(type, method, contentType) {
+    let {
       accessToken,
-      api,
-      space
-    };
+      previewAccessToken,
+      space,
+      usePreviewApi
+    } = config.contentful;
+
+    if (type === 'delivery') {
+      let api = 'cdn';
+
+      if (usePreviewApi) {
+        if (!previewAccessToken) {
+          console.warn('You have specified to use the Contentful Preview API; However, no `previewAccessToken` has been specified in config/environment.js');
+        } else {
+          accessToken = previewAccessToken;
+          api = 'preview';
+        }
+      }
+      return {
+        accessToken,
+        api,
+        space
+      };
+    } else {
+      return this._getHeaders(method, contentType).then((headers) => {
+        return {
+          headers,
+          space
+        };
+      });
+
+    }
+  },
+
+  /**
+    `_getHeaders` returns a headers object for the Contentful Content Management API
+
+    @method _getHeaders
+    @param {String} method
+    @param {String} contentType
+    @return {Object} headers
+    @private
+  */
+  _getHeaders(method, contentType) {
+    return get(this, 'torii').open('contentful-oauth2-bearer').then((authorization) => {
+      let headers = {
+        'Authorization': `Bearer ${authorization.accessToken}`
+      };
+
+      if (method === 'post' || method === 'put') {
+        headers['Content-Type'] = 'application/vnd.contentful.management.v1+json';
+        headers['X-Contentful-Content-Type'] = contentType;
+      }
+      if (method === 'delete') {
+        headers['X-Contentful-Version'] = 4;
+      }
+      return headers;
+    });
   }
 });

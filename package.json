@@ -50,7 +50,8 @@
     "normalize.css": "^4.0.0",
     "postcss-custom-media": "^5.0.1",
     "postcss-custom-properties": "^5.0.0",
-    "postcss-import": "^8.1.0"
+    "postcss-import": "^8.1.0",
+    "torii": "0.6.1"
   },
   "keywords": [
     "ember-addon",
