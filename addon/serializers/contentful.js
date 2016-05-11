@@ -13,6 +13,8 @@ export default DS.JSONSerializer.extend({
     let attributes = {};
 
     if (objHash.sys.type === 'Error') {
+      console.warn(`[Contentful] ${objHash.message}`);
+      console.warn(`[Contentful] It is possible that ${objHash.details.type}:${objHash.details.id} is not published, but is linked in this Entry.`);
       return {};
     }
     modelClass.eachAttribute((key) => {
