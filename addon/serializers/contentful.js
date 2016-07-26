@@ -177,17 +177,16 @@ export default DS.JSONSerializer.extend({
         let item = payload.includes.Entry[i];
         let {
           data
-        } = this.normalize(primaryModelClass, item);
+        } = this.normalize(store.modelFor(item.sys.contentType.sys.id), item);
         entries[i] = data;
       }
 
       let assets = new Array(payload.includes.Asset.length);
       for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
         let item = payload.includes.Asset[i];
-        console.log(primaryModelClass);
         let {
           data
-        } = this.normalize(primaryModelClass, item);
+        } = this.normalize(store.modelFor('contentful-asset'), item);
         assets[i] = data;
       }
       let included = entries.concat(assets);
