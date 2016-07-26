@@ -158,7 +158,7 @@ export default DS.JSONSerializer.extend({
       }
     } else {
 
-      let items = new Array(payload.items.length);
+      let items = new Array();
       for (let i = 0, l = payload.items.length; i < l; i++) {
         let item = payload.items[i];
         let {
@@ -175,11 +175,11 @@ export default DS.JSONSerializer.extend({
 
       if (payload.includes) {
 
-        let entries = null;
-        let assets = null;
+        let entries = new Array();
+        let assets = new Array();
 
         if (payload.includes.Entry) {
-          entries = new Array(payload.includes.Entry.length);
+          entries.push(payload.includes.Entry.length);
           for (let i = 0, l = payload.includes.Entry.length; i < l; i++) {
             let item = payload.includes.Entry[i];
             let {
@@ -190,7 +190,7 @@ export default DS.JSONSerializer.extend({
         }
 
         if (payload.includes.Asset) {
-          assets = new Array(payload.includes.Asset.length);
+          assets.push(payload.includes.Asset.length);
           for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
             let item = payload.includes.Asset[i];
             let {
