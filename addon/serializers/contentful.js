@@ -169,7 +169,7 @@ export default DS.JSONSerializer.extend({
         if (included) {
           documentHash.included.push(...included);
         }
-        items[i] = data;
+        items.push(data);
       }
       documentHash.data = items;
 
@@ -179,24 +179,22 @@ export default DS.JSONSerializer.extend({
         let assets = new Array();
 
         if (payload.includes.Entry) {
-          entries.push(payload.includes.Entry.length);
           for (let i = 0, l = payload.includes.Entry.length; i < l; i++) {
             let item = payload.includes.Entry[i];
             let {
               data
             } = this.normalize(store.modelFor(item.sys.contentType.sys.id), item);
-            entries[i] = data;
+            entries.push(data);
           }
         }
 
         if (payload.includes.Asset) {
-          assets.push(payload.includes.Asset.length);
           for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
             let item = payload.includes.Asset[i];
             let {
               data
             } = this.normalize(store.modelFor('contentful-asset'), item);
-            assets[i] = data;
+            assets.push(data);
           }
         }
 
