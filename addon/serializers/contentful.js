@@ -157,7 +157,8 @@ export default DS.JSONSerializer.extend({
         documentHash.included = included;
       }
     } else {
-      let items = new Array(payload.items.length);
+
+      let items = new Array();
       for (let i = 0, l = payload.items.length; i < l; i++) {
         let item = payload.items[i];
         let {
@@ -168,31 +169,39 @@ export default DS.JSONSerializer.extend({
         if (included) {
           documentHash.included.push(...included);
         }
-        items[i] = data;
+        items.push(data);
       }
       documentHash.data = items;
 
-      let entries = new Array(payload.includes.Entry.length);
-      for (let i = 0, l = payload.includes.Entry.length; i < l; i++) {
-        let item = payload.includes.Entry[i];
-        let {
-          data
-        } = this.normalize(store.modelFor(item.sys.contentType.sys.id), item);
-        entries[i] = data;
-      }
+      if (payload.includes) {
 
-      let assets = new Array(payload.includes.Asset.length);
-      for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
-        let item = payload.includes.Asset[i];
-        let {
-          data
-        } = this.normalize(store.modelFor('contentful-asset'), item);
-        assets[i] = data;
-      }
-      let included = entries.concat(assets);
+        let entries = new Array();
+        let assets = new Array();
 
-      documentHash.included = included;
+        if (payload.includes.Entry) {
+          for (let i = 0, l = payload.includes.Entry.length; i < l; i++) {
+            let item = payload.includes.Entry[i];
+            let {
+              data
+            } = this.normalize(store.modelFor(item.sys.contentType.sys.id), item);
+            entries.push(data);
+          }
+        }
+
+        if (payload.includes.Asset) {
+          for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
+            let item = payload.includes.Asset[i];
+            let {
+              data
+            } = this.normalize(store.modelFor('contentful-asset'), item);
+            assets.push(data);
+          }
+        }
+
+        documentHash.included = entries.concat(assets);
+      }
     }
+
     return documentHash;
   }
 });
