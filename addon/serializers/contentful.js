@@ -13,6 +13,8 @@ export default DS.JSONSerializer.extend({
     let attributes = {};
 
     if (objHash.sys.type === 'Error') {
+      console.warn(`[Contentful] ${objHash.message}`);
+      console.warn(`[Contentful] It is possible that ${objHash.details.type}:${objHash.details.id} is not published, but is linked in this Entry.`);
       return {};
     }
     modelClass.eachAttribute((key) => {
@@ -155,7 +157,7 @@ export default DS.JSONSerializer.extend({
         documentHash.included = included;
       }
     } else {
-      let ret = new Array(payload.items.length);
+      let items = new Array(payload.items.length);
       for (let i = 0, l = payload.items.length; i < l; i++) {
         let item = payload.items[i];
         let {
@@ -166,10 +168,30 @@ export default DS.JSONSerializer.extend({
         if (included) {
           documentHash.included.push(...included);
         }
-        ret[i] = data;
+        items[i] = data;
+      }
+      documentHash.data = items;
+
+      let entries = new Array(payload.includes.Entry.length);
+      for (let i = 0, l = payload.includes.Entry.length; i < l; i++) {
+        let item = payload.includes.Entry[i];
+        let {
+          data
+        } = this.normalize(store.modelFor(item.sys.contentType.sys.id), item);
+        entries[i] = data;
       }
 
-      documentHash.data = ret;
+      let assets = new Array(payload.includes.Asset.length);
+      for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
+        let item = payload.includes.Asset[i];
+        let {
+          data
+        } = this.normalize(store.modelFor('contentful-asset'), item);
+        assets[i] = data;
+      }
+      let included = entries.concat(assets);
+
+      documentHash.included = included;
     }
     return documentHash;
   }
