@@ -170,8 +170,7 @@ export default DS.Adapter.extend({
     } = this._getConfig();
 
     Object.assign(data, {
-      'access_token': accessToken,
-      'include': 20
+      'access_token': accessToken
     });
     return fetch(`https://${api}.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
       headers: {
