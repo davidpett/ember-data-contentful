@@ -157,7 +157,8 @@ export default DS.JSONSerializer.extend({
         documentHash.included = included;
       }
     } else {
-      let ret = new Array(payload.items.length);
+
+      let items = new Array();
       for (let i = 0, l = payload.items.length; i < l; i++) {
         let item = payload.items[i];
         let {
@@ -168,11 +169,39 @@ export default DS.JSONSerializer.extend({
         if (included) {
           documentHash.included.push(...included);
         }
-        ret[i] = data;
+        items.push(data);
       }
+      documentHash.data = items;
 
-      documentHash.data = ret;
+      if (payload.includes) {
+
+        let entries = new Array();
+        let assets = new Array();
+
+        if (payload.includes.Entry) {
+          for (let i = 0, l = payload.includes.Entry.length; i < l; i++) {
+            let item = payload.includes.Entry[i];
+            let {
+              data
+            } = this.normalize(store.modelFor(item.sys.contentType.sys.id), item);
+            entries.push(data);
+          }
+        }
+
+        if (payload.includes.Asset) {
+          for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
+            let item = payload.includes.Asset[i];
+            let {
+              data
+            } = this.normalize(store.modelFor('contentful-asset'), item);
+            assets.push(data);
+          }
+        }
+
+        documentHash.included = entries.concat(assets);
+      }
     }
+
     return documentHash;
   }
 });
