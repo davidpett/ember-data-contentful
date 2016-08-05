@@ -64,6 +64,12 @@
     "ember-cli-babel": "^5.1.5",
     "ember-get-config": "0.0.2"
   },
+  "files": [
+    "addon/",
+    "app/",
+    "blueprints/",
+    "index.js"
+  ],
   "ember-addon": {
     "configPath": "tests/dummy/config",
     "demoURL": "http://davidpett.github.io/ember-data-contentful/"
