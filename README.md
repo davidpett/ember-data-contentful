@@ -8,12 +8,12 @@
 This is an Ember Data adapter/serializer that uses the **READ ONLY** Content Delivery API from [contentful](http://contentful.com)
 
 ## Setup in your app
-```
+```sh
 ember install ember-data-contentful
 ```
 
 After installing the addon, configure your Contentful Space ID and Access Token in `config/environment.js`:
-```
+```js
 contentful: {
   space: 'YOUR-CONTENTFUL-SPACE',
   accessToken: 'YOUR-CONTENTFUL-ACCESS-TOKEN',
@@ -25,7 +25,7 @@ contentful: {
 ### Contentful models
 Included are a few models to help with some of the default fields. here is an example:
 
-```
+```js
 // models/post.js
 import Contentful from 'ember-data-contentful/models/contentful';
 import attr from 'ember-data/attr';
@@ -46,20 +46,20 @@ For any relationship property that is a Contentful Asset (image or other media f
 
 ## Usage
 Once you have configured your tokens and created your models, you can use the normal Ember Data requests of `findRecord`, `findAll`, `queryRecord`, and `query`. For example:
-```
+```js
 model() {
   return this.store.findAll('project');
 }
 ```
 or
-```
+```js
 model(params) {
   return this.store.findRecord('project', params.project_id);
 }
 ```
 
 If you want to use pretty urls and the `slug` field in contentful, you can make your query like so:
-```
+```js
 model(params) {
   return this.store.queryRecord('page', {
     'fields.slug': params.page_slug
@@ -70,7 +70,7 @@ serialize(model) {
 }
 ```
 and ensure that you declare your route in `router.js` like this:
-```
+```js
 this.route('page', { path: ':page_slug' });
 ```
 
