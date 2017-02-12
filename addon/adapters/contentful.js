@@ -51,6 +51,18 @@ export default DS.Adapter.extend({
   deleteRecord: null,
 
   /**
+    Allows the adapter to override the content type param used in api calls where
+    content type param is needed. (e.g. `findAll`, `query`, `queryRecord`)
+
+    @method contentTypeParam
+    @public
+  */
+
+  contentTypeParam(type) {
+    return type.modelName;
+  },
+
+  /**
     Called by the store in order to fetch the JSON for a given
     type and ID.
 
@@ -103,7 +115,7 @@ export default DS.Adapter.extend({
     @public
   */
   findAll(store, type) {
-    return this._getContent('entries', { 'content_type': type.modelName });
+    return this._getContent('entries', { 'content_type': this.contentTypeParam(type) });
   },
 
   /**
@@ -125,7 +137,7 @@ export default DS.Adapter.extend({
   */
   query(store, type, query) {
     query = query || {};
-    query['content_type'] = type.modelName;
+    query['content_type'] = this.contentTypeParam(type);
     return this._getContent('entries', query);
   },
 
@@ -148,7 +160,7 @@ export default DS.Adapter.extend({
   */
   queryRecord(store, type, query) {
     query = query || {};
-    query['content_type'] = type.modelName;
+    query['content_type'] = this.contentTypeParam(type);
     return this._getContent('entries', query);
   },
 
