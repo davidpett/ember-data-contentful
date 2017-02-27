@@ -169,12 +169,10 @@ export default DS.Adapter.extend({
       space
     } = this._getConfig();
 
-    Object.assign(data, {
-      'access_token': accessToken
-    });
     return fetch(`https://${api}.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
       headers: {
-        'Accept': 'application/json; charset=utf-8'
+        'Accept': 'application/json; charset=utf-8',
+        'Authorization': 'Bearer ' + accessToken
       }
     }).then((response) => {
       return response.json();
