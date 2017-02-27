@@ -55,11 +55,13 @@ export default DS.Adapter.extend({
     content type param is needed. (e.g. `findAll`, `query`, `queryRecord`)
 
     @method contentTypeParam
+    @param {String} modelName
+    @return {String}
     @public
   */
 
-  contentTypeParam(type) {
-    return type.modelName;
+  contentTypeParam(modelName) {
+    return modelName;
   },
 
   /**
@@ -115,7 +117,7 @@ export default DS.Adapter.extend({
     @public
   */
   findAll(store, type) {
-    return this._getContent('entries', { 'content_type': this.contentTypeParam(type) });
+    return this._getContent('entries', { 'content_type': this.contentTypeParam(type.modelName) });
   },
 
   /**
@@ -137,7 +139,7 @@ export default DS.Adapter.extend({
   */
   query(store, type, query) {
     query = query || {};
-    query['content_type'] = this.contentTypeParam(type);
+    query['content_type'] = this.contentTypeParam(type.modelName);
     return this._getContent('entries', query);
   },
 
@@ -160,7 +162,7 @@ export default DS.Adapter.extend({
   */
   queryRecord(store, type, query) {
     query = query || {};
-    query['content_type'] = this.contentTypeParam(type);
+    query['content_type'] = this.contentTypeParam(type.modelName);
     return this._getContent('entries', query);
   },
 
