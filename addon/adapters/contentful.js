@@ -172,7 +172,7 @@ export default DS.Adapter.extend({
     return fetch(`https://${api}.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
       headers: {
         'Accept': 'application/json; charset=utf-8',
-        'Authorization': 'Bearer ' + accessToken
+        'Authorization': `Bearer ${accessToken}`
       }
     }).then((response) => {
       return response.json();
