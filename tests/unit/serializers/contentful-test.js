@@ -1,0 +1,194 @@
+import { test, moduleForModel } from 'ember-qunit';
+import ContentfulModel from 'ember-data-contentful/models/contentful';
+import ContentfulAdapter from 'ember-data-contentful/adapters/contentful';
+import ContentfulSerializer from 'ember-data-contentful/serializers/contentful';
+
+import attr from 'ember-data/attr';
+import { belongsTo } from 'ember-data/relationships';
+
+var Post;
+
+moduleForModel('contentful', 'Unit | Serializer | contentful', {
+  needs: ['model:contentful-asset'],
+  beforeEach() {
+    const ApplicationAdapter = ContentfulAdapter.extend({});
+    this.registry.register('adapter:application', ApplicationAdapter);
+
+    const ApplicationSerializer = ContentfulSerializer.extend({});
+    this.registry.register('serializer:application', ApplicationSerializer);
+
+    Post = ContentfulModel.extend({
+      title: attr('string'),
+      image: belongsTo('contentful-asset')
+    });
+
+    this.registry.register('model:post', Post);
+  }
+});
+
+// Sanity check to make sure everything is setup correctly.
+test('returns correct serializer for Post', function(assert) {
+
+  let serializer = this.store().serializerFor('post');
+
+  assert.ok(this.store().serializerFor('post') instanceof ContentfulSerializer, 'serializer returned from serializerFor is an instance of ContentfulSerializer');
+});
+
+test('normalizeQueryRecordResponse with empty items', function(assert) {
+  let id = '';
+  let payload = {
+    "sys": {
+      "type": "Array"
+    },
+    "total": 0,
+    "skip": 0,
+    "limit": 100,
+    "items": []
+  };
+
+  let serializer = this.store().serializerFor('post');
+
+  let documentHash = serializer.normalizeQueryRecordResponse(
+    this.store(),
+    Post,
+    payload,
+    id,
+    'queryRecord'
+  );
+
+  assert.deepEqual(documentHash, { data: null, included: []});
+});
+
+test('normalizeQueryRecordResponse with an item with includes', function(assert) {
+  let id = '';
+  let payload = {
+    "sys": {
+      "type": "Array"
+    },
+    "total": 1,
+    "skip": 0,
+    "limit": 100,
+    "items": [
+      {
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "foobar"
+            }
+          },
+          "id": "1",
+          "type": "Entry",
+          "createdAt": "2017-02-23T21:40:37.180Z",
+          "updatedAt": "2017-02-27T21:24:26.007Z",
+          "revision": 3,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "post"
+            }
+          },
+          "locale": "en-US"
+        },
+        "fields": {
+          "title": "Example Post",
+          "image": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Asset",
+              "id": "2"
+            }
+          }
+        }
+      }
+    ],
+    "includes": {
+      "Asset": [
+        {
+          "sys": {
+            "space": {
+              "sys": {
+                "type": "Link",
+                "linkType": "Space",
+                "id": "foobar"
+              }
+            },
+            "id": "2",
+            "type": "Asset",
+            "createdAt": "2017-02-23T21:35:47.892Z",
+            "updatedAt": "2017-02-23T21:35:47.892Z",
+            "revision": 1,
+            "locale": "en-US"
+          },
+          "fields": {
+            "title": "Sample Image",
+            "file": {
+              "url": "//example.com/image.jpg",
+              "details": {
+                "size": 651763,
+                "image": {
+                  "width": 931,
+                  "height": 1071
+                }
+              },
+              "fileName": "image.jpg",
+              "contentType": "image/jpeg"
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  let serializer = this.store().serializerFor('post');
+
+  let documentHash = serializer.normalizeQueryRecordResponse(
+    this.store(),
+    Post,
+    payload,
+    id,
+    'queryRecord'
+  );
+
+  assert.deepEqual(documentHash, {
+    data: {
+      attributes: {
+        contentType: "post",
+        createdAt: "Thu Feb 23 2017 16:40:37 GMT-0500 (EST)",
+        title: "Example Post",
+        updatedAt: "Mon Feb 27 2017 16:24:26 GMT-0500 (EST)"
+      },
+      id: "1",
+      relationships: {
+        image: {
+          data: {
+            id: "2",
+            type: "contentful-asset"
+          }
+        }
+      },
+      type: "post"
+    },
+    included: [
+      {
+        attributes: {
+          contentType: "asset",
+          createdAt: "Thu Feb 23 2017 16:35:47 GMT-0500 (EST)",
+          file: {
+            contentType: "image/jpeg",
+            details: {},
+            fileName: "image.jpg",
+            url: "//example.com/image.jpg"
+          },
+          title: "Sample Image",
+          updatedAt: "Thu Feb 23 2017 16:35:47 GMT-0500 (EST)"
+        },
+        id: "image",
+        relationships: {},
+        type: "contentful-asset"
+      }
+    ]
+  });
+});
