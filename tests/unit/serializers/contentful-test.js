@@ -60,6 +60,74 @@ test('normalizeQueryRecordResponse with empty items', function(assert) {
 });
 
 test('normalizeQueryRecordResponse with an item with includes', function(assert) {
+  let post = {
+    "sys": {
+      "space": {
+        "sys": {
+          "type": "Link",
+          "linkType": "Space",
+          "id": "foobar"
+        }
+      },
+      "id": "1",
+      "type": "Entry",
+      "createdAt": "2017-02-23T21:40:37.180Z",
+      "updatedAt": "2017-02-27T21:24:26.007Z",
+      "revision": 3,
+      "contentType": {
+        "sys": {
+          "type": "Link",
+          "linkType": "ContentType",
+          "id": "post"
+        }
+      },
+      "locale": "en-US"
+    },
+    "fields": {
+      "title": "Example Post",
+      "image": {
+        "sys": {
+          "type": "Link",
+          "linkType": "Asset",
+          "id": "2"
+        }
+      }
+    }
+  };
+
+  let image = {
+    "sys": {
+      "space": {
+        "sys": {
+          "type": "Link",
+          "linkType": "Space",
+          "id": "foobar"
+        }
+      },
+      "id": "2",
+      "type": "Asset",
+      "createdAt": "2017-02-23T21:35:47.892Z",
+      "updatedAt": "2017-02-23T21:35:47.892Z",
+      "revision": 1,
+      "locale": "en-US"
+    },
+    "fields": {
+      "title": "Sample Image",
+      "file": {
+        "url": "//example.com/image.jpg",
+        "details": {
+          "size": 651763,
+          "image": {
+            "width": 931,
+            "height": 1071
+          }
+        },
+        "fileName": "image.jpg",
+        "contentType": "image/jpeg"
+      }
+    }
+  };
+
   let id = '';
   let payload = {
     "sys": {
@@ -67,78 +135,12 @@ test('normalizeQueryRecordResponse with an item with includes', function(assert)
     },
     "total": 1,
     "skip": 0,
-    "limit": 100,
+    "limit": 1,
     "items": [
-      {
-        "sys": {
-          "space": {
-            "sys": {
-              "type": "Link",
-              "linkType": "Space",
-              "id": "foobar"
-            }
-          },
-          "id": "1",
-          "type": "Entry",
-          "createdAt": "2017-02-23T21:40:37.180Z",
-          "updatedAt": "2017-02-27T21:24:26.007Z",
-          "revision": 3,
-          "contentType": {
-            "sys": {
-              "type": "Link",
-              "linkType": "ContentType",
-              "id": "post"
-            }
-          },
-          "locale": "en-US"
-        },
-        "fields": {
-          "title": "Example Post",
-          "image": {
-            "sys": {
-              "type": "Link",
-              "linkType": "Asset",
-              "id": "2"
-            }
-          }
-        }
-      }
+      post
     ],
     "includes": {
-      "Asset": [
-        {
-          "sys": {
-            "space": {
-              "sys": {
-                "type": "Link",
-                "linkType": "Space",
-                "id": "foobar"
-              }
-            },
-            "id": "2",
-            "type": "Asset",
-            "createdAt": "2017-02-23T21:35:47.892Z",
-            "updatedAt": "2017-02-23T21:35:47.892Z",
-            "revision": 1,
-            "locale": "en-US"
-          },
-          "fields": {
-            "title": "Sample Image",
-            "file": {
-              "url": "//example.com/image.jpg",
-              "details": {
-                "size": 651763,
-                "image": {
-                  "width": 931,
-                  "height": 1071
-                }
-              },
-              "fileName": "image.jpg",
-              "contentType": "image/jpeg"
-            }
-          }
-        }
-      ]
+      "Asset": [ image ]
     }
   };
 
@@ -152,43 +154,48 @@ test('normalizeQueryRecordResponse with an item with includes', function(assert)
     'queryRecord'
   );
 
-  assert.deepEqual(documentHash, {
-    data: {
-      attributes: {
-        contentType: "post",
-        createdAt: "Thu Feb 23 2017 16:40:37 GMT-0500 (EST)",
-        title: "Example Post",
-        updatedAt: "Mon Feb 27 2017 16:24:26 GMT-0500 (EST)"
-      },
-      id: "1",
-      relationships: {
-        image: {
-          data: {
-            id: "2",
-            type: "contentful-asset"
-          }
-        }
-      },
-      type: "post"
-    },
-    included: [
-      {
-        attributes: {
-          contentType: "asset",
-          createdAt: "Thu Feb 23 2017 16:35:47 GMT-0500 (EST)",
-          file: {
-            contentType: "image/jpeg",
-            details: {},
-            fileName: "image.jpg",
-            url: "//example.com/image.jpg"
-          },
-          title: "Sample Image",
-          updatedAt: "Thu Feb 23 2017 16:35:47 GMT-0500 (EST)"
-        },
-        id: "image",
-        relationships: {},
-        type: "contentful-asset"
+  assert.equal(documentHash.data.attributes.contentType, "post");
+  assert.equal(documentHash.data.attributes.title, post.fields.title);
+  let expectedCreatedAt = new Date(documentHash.data.attributes.createdAt);
+  let actualCreatedAt = new Date(post.sys.createdAt);
+  assert.equal(expectedCreatedAt.toString(), actualCreatedAt.toString());
+  let expectedUpdatedAt = new Date(documentHash.data.attributes.updatedAt);
+  let actualUpdatedAt = new Date(post.sys.updatedAt);
+  assert.equal(expectedUpdatedAt.toString(), actualUpdatedAt.toString());
+  assert.equal(documentHash.data.id, post.sys.id);
+  assert.equal(documentHash.data.type, "post");
+  assert.deepEqual(documentHash.data.relationships, {
+    "image": {
+      "data": {
+        "id": '2',
+        "type": 'contentful-asset'
       }
-    ]
+    }
   });
+
+  assert.equal(documentHash.included.length, 1);
+  let asset = documentHash.included[0];
+  assert.equal(asset.attributes.contentType, "asset");
+  assert.equal(asset.id, image.sys.id);
+  assert.equal(asset.type, "contentful-asset");
+  assert.equal(asset.attributes.title, image.fields.title);
+  assert.deepEqual(asset.attributes.file, {
+    contentType: "image/jpeg",
+    details: {
+      size: 651763,
+      image: {
+        width: 931,
+        height: 1071
+      }
+    },
+    fileName: "image.jpg",
+    url: "//example.com/image.jpg"
+  });
+  let expectedAssetCreatedAt = new Date(asset.attributes.createdAt);
+  let actualAssetCreatedAt = new Date(image.sys.createdAt);
+  assert.equal(expectedAssetCreatedAt.toString(), actualAssetCreatedAt.toString());
+  let expectedAssetUpdatedAt = new Date(asset.attributes.updatedAt);
+  let actualAssetUpdatedAt = new Date(image.sys.updatedAt);
+  assert.equal(expectedAssetUpdatedAt.toString(), actualAssetUpdatedAt.toString());
+  assert.deepEqual(asset.relationships, {});
 });
