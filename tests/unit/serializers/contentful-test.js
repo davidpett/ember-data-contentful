@@ -34,6 +34,53 @@ test('returns correct serializer for Post', function(assert) {
   assert.ok(this.store().serializerFor('post') instanceof ContentfulSerializer, 'serializer returned from serializerFor is an instance of ContentfulSerializer');
 });
 
+test('modelNameFromPayloadType for Asset', function(assert) {
+  let sys = {
+    "id": "nyancat",
+    "type": "Asset",
+    "space": {
+      "sys": {
+        "type": "Link",
+        "linkType": "Space",
+        "id": "spaceid"
+      }
+    }
+  };
+  let serializer = this.store().serializerFor('post');
+
+  assert.equal(serializer.modelNameFromPayloadType(sys), 'contentful-asset');
+
+});
+
+test('modelNameFromPayloadType for Entry', function(assert) {
+  let sys = {
+    "space": {
+      "sys": {
+        "type": "Link",
+        "linkType": "Space",
+        "id": "spaceid"
+      }
+    },
+    "id": "entryid",
+    "type": "Entry",
+    "createdAt": "2017-02-14T20:29:53.330Z",
+    "updatedAt": "2017-02-27T20:21:34.142Z",
+    "revision": 8,
+    "contentType": {
+      "sys": {
+        "type": "Link",
+        "linkType": "ContentType",
+        "id": "post"
+      }
+    },
+    "locale": "en-US"
+  };
+  let serializer = this.store().serializerFor('post');
+
+  assert.equal(serializer.modelNameFromPayloadType(sys), 'post');
+
+});
+
 test('normalizeQueryRecordResponse with empty items', function(assert) {
   let id = '';
   let payload = {
