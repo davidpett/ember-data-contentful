@@ -9,12 +9,20 @@
 
     {{content-for "head"}}
 
-    <link rel="stylesheet" href="{{rootURL}}assets/vendor.css">
-    <link rel="stylesheet" href="{{rootURL}}assets/dummy.css">
+    <style>
+      a {
+        color: #357EDD;
+      }
+      a:hover,
+      a:focus {
+        color: #96CCFF;
+      }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.6.1/css/tachyons.min.css" />
 
     {{content-for "head-footer"}}
   </head>
-  <body>
+  <body class="sans-serif black-70">
     {{content-for "body"}}
 
     <script src="{{rootURL}}assets/vendor.js"></script>
