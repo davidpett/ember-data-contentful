@@ -153,7 +153,7 @@ export default DS.JSONSerializer.extend({
 
   normalizeArrayResponse(store, primaryModelClass, payload, id, requestType) {
     return {
-      data: payload.items.map(function(item) {
+      data: payload.items.map((item) => {
         return this.normalize(primaryModelClass, item).data;
       }),
       included: this._extractIncludes(store, payload)

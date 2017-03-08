@@ -290,3 +290,86 @@ test('normalizeQueryRecordResponse with an item with includes', function(assert)
 
   assert.deepEqual(asset.relationships, {});
 });
+
+test('normalizeQueryResponse with an item with includes', function(assert) {
+
+  let id = '';
+  let payload = {
+    "sys": {
+      "type": "Array"
+    },
+    "total": 1,
+    "skip": 0,
+    "limit": 1,
+    "items": [
+      post
+    ],
+    "includes": {
+      "Asset": [ image ]
+    }
+  };
+
+  let serializer = this.store().serializerFor('post');
+
+  let documentHash = serializer.normalizeQueryResponse(
+    this.store(),
+    Post,
+    payload,
+    id,
+    'queryRecord'
+  );
+
+  assert.equal(documentHash.data.length, 1);
+
+  let postData = documentHash.data[0];
+  assert.equal(postData.attributes.contentType, "post");
+  assert.equal(postData.attributes.title, post.fields.title);
+
+  let expectedCreatedAt = new Date(postData.attributes.createdAt);
+  let actualCreatedAt = new Date(post.sys.createdAt);
+  assert.equal(expectedCreatedAt.toString(), actualCreatedAt.toString());
+
+  let expectedUpdatedAt = new Date(postData.attributes.updatedAt);
+  let actualUpdatedAt = new Date(post.sys.updatedAt);
+  assert.equal(expectedUpdatedAt.toString(), actualUpdatedAt.toString());
+
+  assert.equal(postData.id, post.sys.id);
+  assert.equal(postData.type, "post");
+  assert.deepEqual(postData.relationships, {
+    "image": {
+      "data": {
+        "id": '2',
+        "type": 'contentful-asset'
+      }
+    }
+  });
+
+  assert.equal(documentHash.included.length, 1);
+  let asset = documentHash.included[0];
+  assert.equal(asset.attributes.contentType, "asset");
+  assert.equal(asset.id, image.sys.id);
+  assert.equal(asset.type, "contentful-asset");
+  assert.equal(asset.attributes.title, image.fields.title);
+  assert.deepEqual(asset.attributes.file, {
+    contentType: "image/jpeg",
+    details: {
+      size: 651763,
+      image: {
+        width: 931,
+        height: 1071
+      }
+    },
+    fileName: "image.jpg",
+    url: "//example.com/image.jpg"
+  });
+
+  let expectedAssetCreatedAt = new Date(asset.attributes.createdAt);
+  let actualAssetCreatedAt = new Date(image.sys.createdAt);
+  assert.equal(expectedAssetCreatedAt.toString(), actualAssetCreatedAt.toString());
+
+  let expectedAssetUpdatedAt = new Date(asset.attributes.updatedAt);
+  let actualAssetUpdatedAt = new Date(image.sys.updatedAt);
+  assert.equal(expectedAssetUpdatedAt.toString(), actualAssetUpdatedAt.toString());
+
+  assert.deepEqual(asset.relationships, {});
+});
