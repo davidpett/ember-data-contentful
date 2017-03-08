@@ -1,5 +1,6 @@
 import { test, only, moduleForModel } from 'ember-qunit';
 import ContentfulModel from 'ember-data-contentful/models/contentful';
+import ContentfulAsset from 'ember-data-contentful/models/contentful-asset';
 import ContentfulAdapter from 'ember-data-contentful/adapters/contentful';
 import ContentfulSerializer from 'ember-data-contentful/serializers/contentful';
 
@@ -151,6 +152,38 @@ test('normalize with Entry payload', function(assert) {
       }
     }
   });
+});
+
+test('normalize with Asset payload', function(assert) {
+  let serializer = this.store().serializerFor('contentful-asset');
+  let resourceHash = image;
+
+  let normalizedAsset = serializer.normalize(ContentfulAsset, resourceHash);
+
+  assert.equal(normalizedAsset.data.attributes.contentType, "asset");
+  assert.equal(normalizedAsset.data.id, image.sys.id);
+  assert.equal(normalizedAsset.data.type, "contentful-asset");
+  assert.equal(normalizedAsset.data.attributes.title, image.fields.title);
+  assert.deepEqual(normalizedAsset.data.attributes.file, {
+    contentType: "image/jpeg",
+    details: {
+      size: 651763,
+      image: {
+        width: 931,
+        height: 1071
+      }
+    },
+    fileName: "image.jpg",
+    url: "//example.com/image.jpg"
+  });
+
+  let expectedAssetCreatedAt = new Date(normalizedAsset.data.attributes.createdAt);
+  let actualAssetCreatedAt = new Date(image.sys.createdAt);
+  assert.equal(expectedAssetCreatedAt.toString(), actualAssetCreatedAt.toString());
+
+  let expectedAssetUpdatedAt = new Date(normalizedAsset.data.attributes.updatedAt);
+  let actualAssetUpdatedAt = new Date(image.sys.updatedAt);
+  assert.equal(expectedAssetUpdatedAt.toString(), actualAssetUpdatedAt.toString());
 });
 
 test('normalizeQueryRecordResponse with empty items', function(assert) {
