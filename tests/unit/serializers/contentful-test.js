@@ -1,4 +1,4 @@
-import { test, moduleForModel } from 'ember-qunit';
+import { test, only, moduleForModel } from 'ember-qunit';
 import ContentfulModel from 'ember-data-contentful/models/contentful';
 import ContentfulAdapter from 'ember-data-contentful/adapters/contentful';
 import ContentfulSerializer from 'ember-data-contentful/serializers/contentful';
@@ -6,7 +6,8 @@ import ContentfulSerializer from 'ember-data-contentful/serializers/contentful';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'ember-data/relationships';
 
-var Post;
+var Post, post, image;
+
 
 moduleForModel('contentful', 'Unit | Serializer | contentful', {
   needs: ['model:contentful-asset'],
@@ -23,6 +24,73 @@ moduleForModel('contentful', 'Unit | Serializer | contentful', {
     });
 
     this.registry.register('model:post', Post);
+    post = {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "foobar"
+          }
+        },
+        "id": "1",
+        "type": "Entry",
+        "createdAt": "2017-02-23T21:40:37.180Z",
+        "updatedAt": "2017-02-27T21:24:26.007Z",
+        "revision": 3,
+        "contentType": {
+          "sys": {
+            "type": "Link",
+            "linkType": "ContentType",
+            "id": "post"
+          }
+        },
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Example Post",
+        "image": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Asset",
+            "id": "2"
+          }
+        }
+      }
+    };
+
+    image = {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "foobar"
+          }
+        },
+        "id": "2",
+        "type": "Asset",
+        "createdAt": "2017-02-23T21:35:47.892Z",
+        "updatedAt": "2017-02-23T21:35:47.892Z",
+        "revision": 1,
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Sample Image",
+        "file": {
+          "url": "//example.com/image.jpg",
+          "details": {
+            "size": 651763,
+            "image": {
+              "width": 931,
+              "height": 1071
+            }
+          },
+          "fileName": "image.jpg",
+          "contentType": "image/jpeg"
+        }
+      }
+    };
   }
 });
 
@@ -35,17 +103,7 @@ test('returns correct serializer for Post', function(assert) {
 });
 
 test('modelNameFromPayloadType for Asset', function(assert) {
-  let sys = {
-    "id": "nyancat",
-    "type": "Asset",
-    "space": {
-      "sys": {
-        "type": "Link",
-        "linkType": "Space",
-        "id": "spaceid"
-      }
-    }
-  };
+  let sys = image.sys;
   let serializer = this.store().serializerFor('post');
 
   assert.equal(serializer.modelNameFromPayloadType(sys), 'contentful-asset');
@@ -53,32 +111,46 @@ test('modelNameFromPayloadType for Asset', function(assert) {
 });
 
 test('modelNameFromPayloadType for Entry', function(assert) {
-  let sys = {
-    "space": {
-      "sys": {
-        "type": "Link",
-        "linkType": "Space",
-        "id": "spaceid"
-      }
-    },
-    "id": "entryid",
-    "type": "Entry",
-    "createdAt": "2017-02-14T20:29:53.330Z",
-    "updatedAt": "2017-02-27T20:21:34.142Z",
-    "revision": 8,
-    "contentType": {
-      "sys": {
-        "type": "Link",
-        "linkType": "ContentType",
-        "id": "post"
-      }
-    },
-    "locale": "en-US"
-  };
+  let sys = post.sys;
   let serializer = this.store().serializerFor('post');
 
   assert.equal(serializer.modelNameFromPayloadType(sys), 'post');
 
+});
+
+test('normalize with empty resourceHash', function(assert) {
+  let resourceHash = null;
+  let serializer = this.store().serializerFor('post');
+
+  assert.deepEqual(serializer.normalize(Post, resourceHash), { data: null });
+});
+
+test('normalize with Entry payload', function(assert) {
+  let serializer = this.store().serializerFor('post');
+  let resourceHash = post;
+
+  let normalizedPost = serializer.normalize(Post, resourceHash);
+  assert.equal(normalizedPost.data.attributes.contentType, "post");
+  assert.equal(normalizedPost.data.attributes.title, post.fields.title);
+
+  let expectedCreatedAt = new Date(normalizedPost.data.attributes.createdAt);
+  let actualCreatedAt = new Date(post.sys.createdAt);
+  assert.equal(expectedCreatedAt.toString(), actualCreatedAt.toString());
+
+  let expectedUpdatedAt = new Date(normalizedPost.data.attributes.updatedAt);
+  let actualUpdatedAt = new Date(post.sys.updatedAt);
+  assert.equal(expectedUpdatedAt.toString(), actualUpdatedAt.toString());
+
+  assert.equal(normalizedPost.data.id, post.sys.id);
+  assert.equal(normalizedPost.data.type, "post");
+  assert.deepEqual(normalizedPost.data.relationships, {
+    "image": {
+      "data": {
+        "id": '2',
+        "type": 'contentful-asset'
+      }
+    }
+  });
 });
 
 test('normalizeQueryRecordResponse with empty items', function(assert) {
@@ -107,73 +179,6 @@ test('normalizeQueryRecordResponse with empty items', function(assert) {
 });
 
 test('normalizeQueryRecordResponse with an item with includes', function(assert) {
-  let post = {
-    "sys": {
-      "space": {
-        "sys": {
-          "type": "Link",
-          "linkType": "Space",
-          "id": "foobar"
-        }
-      },
-      "id": "1",
-      "type": "Entry",
-      "createdAt": "2017-02-23T21:40:37.180Z",
-      "updatedAt": "2017-02-27T21:24:26.007Z",
-      "revision": 3,
-      "contentType": {
-        "sys": {
-          "type": "Link",
-          "linkType": "ContentType",
-          "id": "post"
-        }
-      },
-      "locale": "en-US"
-    },
-    "fields": {
-      "title": "Example Post",
-      "image": {
-        "sys": {
-          "type": "Link",
-          "linkType": "Asset",
-          "id": "2"
-        }
-      }
-    }
-  };
-
-  let image = {
-    "sys": {
-      "space": {
-        "sys": {
-          "type": "Link",
-          "linkType": "Space",
-          "id": "foobar"
-        }
-      },
-      "id": "2",
-      "type": "Asset",
-      "createdAt": "2017-02-23T21:35:47.892Z",
-      "updatedAt": "2017-02-23T21:35:47.892Z",
-      "revision": 1,
-      "locale": "en-US"
-    },
-    "fields": {
-      "title": "Sample Image",
-      "file": {
-        "url": "//example.com/image.jpg",
-        "details": {
-          "size": 651763,
-          "image": {
-            "width": 931,
-            "height": 1071
-          }
-        },
-        "fileName": "image.jpg",
-        "contentType": "image/jpeg"
-      }
-    }
-  };
 
   let id = '';
   let payload = {
@@ -203,12 +208,15 @@ test('normalizeQueryRecordResponse with an item with includes', function(assert)
 
   assert.equal(documentHash.data.attributes.contentType, "post");
   assert.equal(documentHash.data.attributes.title, post.fields.title);
+
   let expectedCreatedAt = new Date(documentHash.data.attributes.createdAt);
   let actualCreatedAt = new Date(post.sys.createdAt);
   assert.equal(expectedCreatedAt.toString(), actualCreatedAt.toString());
+
   let expectedUpdatedAt = new Date(documentHash.data.attributes.updatedAt);
   let actualUpdatedAt = new Date(post.sys.updatedAt);
   assert.equal(expectedUpdatedAt.toString(), actualUpdatedAt.toString());
+
   assert.equal(documentHash.data.id, post.sys.id);
   assert.equal(documentHash.data.type, "post");
   assert.deepEqual(documentHash.data.relationships, {
@@ -238,11 +246,14 @@ test('normalizeQueryRecordResponse with an item with includes', function(assert)
     fileName: "image.jpg",
     url: "//example.com/image.jpg"
   });
+
   let expectedAssetCreatedAt = new Date(asset.attributes.createdAt);
   let actualAssetCreatedAt = new Date(image.sys.createdAt);
   assert.equal(expectedAssetCreatedAt.toString(), actualAssetCreatedAt.toString());
+
   let expectedAssetUpdatedAt = new Date(asset.attributes.updatedAt);
   let actualAssetUpdatedAt = new Date(image.sys.updatedAt);
   assert.equal(expectedAssetUpdatedAt.toString(), actualAssetUpdatedAt.toString());
+
   assert.deepEqual(asset.relationships, {});
 });

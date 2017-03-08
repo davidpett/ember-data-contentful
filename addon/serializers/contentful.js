@@ -144,51 +144,20 @@ export default DS.JSONSerializer.extend({
     return this.normalizeArrayResponse(...arguments);
   },
 
-  normalizeSingleResponse() {
-    return this._normalizeResponse(...arguments, true);
-  },
-
-  normalizeArrayResponse() {
-    return this._normalizeResponse(...arguments, false);
-  },
-
-  _normalizeResponse(store, primaryModelClass, payload, id, requestType, isSingle) {
-    let documentHash = {
-      data: null,
-      included: []
+  normalizeSingleResponse(store, primaryModelClass, payload, id, requestType) {
+    return {
+      data: this.normalize(primaryModelClass, payload).data,
+      included: this._extractIncludes(store, payload)
     };
+  },
 
-    if (isSingle) {
-      let {
-        data,
-        included
-      } = this.normalize(primaryModelClass, payload);
-
-      documentHash.data = data;
-      if (included) {
-        documentHash.included = included;
-      }
-    } else {
-
-      let items = new Array();
-      for (let i = 0, l = payload.items.length; i < l; i++) {
-        let item = payload.items[i];
-        let {
-          data,
-          included
-        } = this.normalize(primaryModelClass, item);
-
-        if (included) {
-          documentHash.included.push(...included);
-        }
-        items.push(data);
-      }
-      documentHash.data = items;
-    }
-
-    documentHash.included = this._extractIncludes(store, payload);
-
-    return documentHash;
+  normalizeArrayResponse(store, primaryModelClass, payload, id, requestType) {
+    return {
+      data: payload.items.map(function(item) {
+        return this.normalize(primaryModelClass, item).data;
+      }),
+      included: this._extractIncludes(store, payload)
+    };
   },
 
   _extractIncludes(store, payload) {
@@ -197,23 +166,15 @@ export default DS.JSONSerializer.extend({
       let assets = new Array();
 
       if (payload.includes.Entry) {
-        for (let i = 0, l = payload.includes.Entry.length; i < l; i++) {
-          let item = payload.includes.Entry[i];
-          let {
-            data
-          } = this.normalize(store.modelFor(item.sys.contentType.sys.id), item);
-          entries.push(data);
-        }
+        entries = payload.includes.Entry.map((item) => {
+          return this.normalize(store.modelFor(item.sys.contentType.sys.id), item).data;
+        });
       }
 
       if (payload.includes.Asset) {
-        for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
-          let item = payload.includes.Asset[i];
-          let {
-            data
-          } = this.normalize(store.modelFor('contentful-asset'), item);
-          assets.push(data);
-        }
+        assets = payload.includes.Asset.map((item) => {
+          return this.normalize(store.modelFor('contentful-asset'), item).data;
+        });
       }
 
       return entries.concat(assets);
