@@ -1,8 +1,10 @@
-<h2>{{model.title}}</h2>
-<h3>by {{#each model.author as |author|}}{{author.name}}{{/each}}</h3>
+<h2 class="f2">{{model.title}}</h2>
+<h3 class="f3">by {{#each model.author as |author|}}{{author.name}}{{/each}}</h3>
 
 {{#if model.featuredImage}}
-  <img src="{{model.featuredImage.file.url}}" alt="" />
+  <img src="{{model.featuredImage.file.url}}" alt="" class="mw-100" />
 {{/if}}
 
-{{md-text text=model.body html=true linkify=true typographer=true}}
+<div class="measure-wide">
+  {{md-text text=model.body}}
+</div>
