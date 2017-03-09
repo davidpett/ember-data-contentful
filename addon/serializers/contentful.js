@@ -156,8 +156,32 @@ export default DS.JSONSerializer.extend({
       data: payload.items.map((item) => {
         return this.normalize(primaryModelClass, item).data;
       }),
-      included: this._extractIncludes(store, payload)
+      included: this._extractIncludes(store, payload),
+      meta: this.extractMeta(store, primaryModelClass, payload)
     };
+  },
+
+  /**
+    @method extractMeta
+    @param {DS.Store} store
+    @param {DS.Model} modelClass
+    @param {Object} payload
+    @return {Object} { total: Integer, limit: Integer, skip: Integer }
+  **/
+  extractMeta(store, modelClass, payload) {
+    if (payload) {
+      let meta = {};
+      if (payload.hasOwnProperty('limit')) {
+        meta.limit = payload.limit;
+      }
+      if (payload.hasOwnProperty('skip')) {
+        meta.skip = payload.skip;
+      }
+      if (payload.hasOwnProperty('total')) {
+        meta.total = payload.total;
+      }
+      return meta;
+    }
   },
 
   _extractIncludes(store, payload) {

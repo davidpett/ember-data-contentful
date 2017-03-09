@@ -319,6 +319,7 @@ test('normalizeQueryResponse with an item with includes', function(assert) {
     'queryRecord'
   );
 
+  // Items (Posts)
   assert.equal(documentHash.data.length, 1);
 
   let postData = documentHash.data[0];
@@ -344,6 +345,7 @@ test('normalizeQueryResponse with an item with includes', function(assert) {
     }
   });
 
+  // Includes
   assert.equal(documentHash.included.length, 1);
   let asset = documentHash.included[0];
   assert.equal(asset.attributes.contentType, "asset");
@@ -372,4 +374,42 @@ test('normalizeQueryResponse with an item with includes', function(assert) {
   assert.equal(expectedAssetUpdatedAt.toString(), actualAssetUpdatedAt.toString());
 
   assert.deepEqual(asset.relationships, {});
+
+  // Meta
+  let meta = serializer.extractMeta(this.store(), Post, payload);
+  assert.deepEqual(documentHash.meta, meta);
+});
+
+test('extractMeta returns null without a payload', function(assert) {
+  let serializer = this.store().serializerFor('post');
+  let meta = serializer.extractMeta(this.store(), Post, null);
+
+  assert.equal(meta, null);
+});
+
+test('extractMeta returns meta from payload', function(assert) {
+  let payload = {
+    "sys": {
+      "type": "Array"
+    },
+    "total": 3,
+    "skip": 1,
+    "limit": 2,
+    "items": [
+      post
+    ],
+    "includes": {
+      "Asset": [ image ]
+    }
+  };
+
+  let serializer = this.store().serializerFor('post');
+
+  let meta = serializer.extractMeta(this.store(), Post, payload);
+
+  assert.deepEqual(meta, {
+    total: 3,
+    skip: 1,
+    limit: 2
+  });
 });
