@@ -66,13 +66,21 @@ export default DS.JSONSerializer.extend({
     return { id: relationshipHash.sys.id, type: relationshipModelName };
   },
 
+  modelNameFromPayloadType(sys) {
+    if (sys.type === "Asset") {
+      return 'contentful-asset';
+    } else {
+      return sys.contentType.sys.id;
+    }
+  },
+
   normalize(modelClass, resourceHash) {
     let data = null;
 
     if (resourceHash) {
       data = {
         id: resourceHash.sys.id,
-        type: modelClass.modelName,
+        type: this.modelNameFromPayloadType(resourceHash.sys),
         attributes: this.extractAttributes(modelClass, resourceHash.fields, resourceHash),
         relationships: this.extractRelationships(modelClass, resourceHash.fields)
       };
@@ -108,8 +116,12 @@ export default DS.JSONSerializer.extend({
   },
 
   normalizeQueryRecordResponse(store, primaryModelClass, payload, id, requestType) {
-    let [firstItem] = payload.items;
-    return this.normalizeSingleResponse(store, primaryModelClass, firstItem, id, requestType);
+    let singlePayload = null;
+    if (parseInt(payload.total) > 0) {
+      singlePayload = payload.items[0];
+      singlePayload.includes = payload.includes;
+    }
+    return this.normalizeSingleResponse(store, primaryModelClass, singlePayload, id, requestType);
   },
 
   normalizeFindAllResponse() {
@@ -132,76 +144,43 @@ export default DS.JSONSerializer.extend({
     return this.normalizeArrayResponse(...arguments);
   },
 
-  normalizeSingleResponse() {
-    return this._normalizeResponse(...arguments, true);
-  },
-
-  normalizeArrayResponse() {
-    return this._normalizeResponse(...arguments, false);
-  },
-
-  _normalizeResponse(store, primaryModelClass, payload, id, requestType, isSingle) {
-    let documentHash = {
-      data: null,
-      included: []
+  normalizeSingleResponse(store, primaryModelClass, payload, id, requestType) {
+    return {
+      data: this.normalize(primaryModelClass, payload).data,
+      included: this._extractIncludes(store, payload)
     };
+  },
 
-    if (isSingle) {
-      let {
-        data,
-        included
-      } = this.normalize(primaryModelClass, payload);
+  normalizeArrayResponse(store, primaryModelClass, payload, id, requestType) {
+    return {
+      data: payload.items.map((item) => {
+        return this.normalize(primaryModelClass, item).data;
+      }),
+      included: this._extractIncludes(store, payload)
+    };
+  },
 
-      documentHash.data = data;
-      if (included) {
-        documentHash.included = included;
+  _extractIncludes(store, payload) {
+    if(payload && payload.hasOwnProperty('includes')) {
+      let entries = new Array();
+      let assets = new Array();
+
+      if (payload.includes.Entry) {
+        entries = payload.includes.Entry.map((item) => {
+          return this.normalize(store.modelFor(item.sys.contentType.sys.id), item).data;
+        });
       }
+
+      if (payload.includes.Asset) {
+        assets = payload.includes.Asset.map((item) => {
+          return this.normalize(store.modelFor('contentful-asset'), item).data;
+        });
+      }
+
+      return entries.concat(assets);
     } else {
-
-      let items = new Array();
-      for (let i = 0, l = payload.items.length; i < l; i++) {
-        let item = payload.items[i];
-        let {
-          data,
-          included
-        } = this.normalize(primaryModelClass, item);
-
-        if (included) {
-          documentHash.included.push(...included);
-        }
-        items.push(data);
-      }
-      documentHash.data = items;
-
-      if (payload.includes) {
-
-        let entries = new Array();
-        let assets = new Array();
-
-        if (payload.includes.Entry) {
-          for (let i = 0, l = payload.includes.Entry.length; i < l; i++) {
-            let item = payload.includes.Entry[i];
-            let {
-              data
-            } = this.normalize(store.modelFor(item.sys.contentType.sys.id), item);
-            entries.push(data);
-          }
-        }
-
-        if (payload.includes.Asset) {
-          for (let i = 0, l = payload.includes.Asset.length; i < l; i++) {
-            let item = payload.includes.Asset[i];
-            let {
-              data
-            } = this.normalize(store.modelFor('contentful-asset'), item);
-            assets.push(data);
-          }
-        }
-
-        documentHash.included = entries.concat(assets);
-      }
+      return [];
     }
-
-    return documentHash;
   }
+
 });
