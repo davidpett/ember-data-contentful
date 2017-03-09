@@ -163,6 +163,8 @@ export default DS.Adapter.extend({
   queryRecord(store, type, query) {
     query = query || {};
     query['content_type'] = this.contentTypeParam(type.modelName);
+    query['limit'] = 1;
+    query['skip'] = 0;
     return this._getContent('entries', query);
   },
 
