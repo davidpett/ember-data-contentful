@@ -302,9 +302,39 @@ test('normalizeQueryRecordResponse with an item w/o includes', function(assert) 
     "skip": 0,
     "limit": 1,
     "items": [
-      post
+      {
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "foobar"
+            }
+          },
+          "id": "1",
+          "type": "Entry",
+          "createdAt": "2017-02-23T21:40:37.180Z",
+          "updatedAt": "2017-02-27T21:24:26.007Z",
+          "revision": 3,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "post"
+            }
+          },
+          "locale": "en-US"
+        },
+        "fields": {
+          "title": "Example Post"
+        }
+      }
     ]
   };
+
+  Post = ContentfulModel.extend({
+    title: attr('string')
+  });
 
   let serializer = this.store().serializerFor('post');
 
@@ -329,15 +359,7 @@ test('normalizeQueryRecordResponse with an item w/o includes', function(assert) 
 
   assert.equal(documentHash.data.id, post.sys.id);
   assert.equal(documentHash.data.type, "post");
-  assert.deepEqual(documentHash.data.relationships, {
-    "image": {
-      "data": {
-        "id": '2',
-        "type": 'contentful-asset'
-      }
-    }
-  });
-
+  assert.deepEqual(documentHash.data.relationships, {});
   assert.equal(documentHash.included.length, 0);
 });
 
@@ -441,9 +463,39 @@ test('normalizeQueryResponse with an item w/o includes', function(assert) {
     "skip": 0,
     "limit": 1,
     "items": [
-      post
+      {
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "foobar"
+            }
+          },
+          "id": "1",
+          "type": "Entry",
+          "createdAt": "2017-02-23T21:40:37.180Z",
+          "updatedAt": "2017-02-27T21:24:26.007Z",
+          "revision": 3,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "post"
+            }
+          },
+          "locale": "en-US"
+        },
+        "fields": {
+          "title": "Example Post"
+        }
+      }
     ]
   };
+
+  Post = ContentfulModel.extend({
+    title: attr('string')
+  });
 
   let serializer = this.store().serializerFor('post');
 
@@ -472,14 +524,7 @@ test('normalizeQueryResponse with an item w/o includes', function(assert) {
 
   assert.equal(postData.id, post.sys.id);
   assert.equal(postData.type, "post");
-  assert.deepEqual(postData.relationships, {
-    "image": {
-      "data": {
-        "id": '2',
-        "type": 'contentful-asset'
-      }
-    }
-  });
+  assert.deepEqual(postData.relationships, {});
 
   // Includes
   assert.equal(documentHash.included.length, 0);
