@@ -185,7 +185,7 @@ export default DS.JSONSerializer.extend({
   },
 
   _extractIncludes(store, payload) {
-    if(payload && payload.hasOwnProperty('includes')) {
+    if(payload && payload.hasOwnProperty('includes') && typeof payload.includes !== "undefined") {
       let entries = new Array();
       let assets = new Array();
 
