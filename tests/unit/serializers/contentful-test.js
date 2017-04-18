@@ -291,6 +291,78 @@ test('normalizeQueryRecordResponse with an item with includes', function(assert)
   assert.deepEqual(asset.relationships, {});
 });
 
+test('normalizeQueryRecordResponse with an item w/o includes', function(assert) {
+
+  let id = '';
+  let payload = {
+    "sys": {
+      "type": "Array"
+    },
+    "total": 1,
+    "skip": 0,
+    "limit": 1,
+    "items": [
+      {
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "foobar"
+            }
+          },
+          "id": "1",
+          "type": "Entry",
+          "createdAt": "2017-02-23T21:40:37.180Z",
+          "updatedAt": "2017-02-27T21:24:26.007Z",
+          "revision": 3,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "post"
+            }
+          },
+          "locale": "en-US"
+        },
+        "fields": {
+          "title": "Example Post"
+        }
+      }
+    ]
+  };
+
+  Post = ContentfulModel.extend({
+    title: attr('string')
+  });
+
+  let serializer = this.store().serializerFor('post');
+
+  let documentHash = serializer.normalizeQueryRecordResponse(
+    this.store(),
+    Post,
+    payload,
+    id,
+    'queryRecord'
+  );
+
+  assert.equal(documentHash.data.attributes.contentType, "post");
+  assert.equal(documentHash.data.attributes.title, post.fields.title);
+
+  let expectedCreatedAt = new Date(documentHash.data.attributes.createdAt);
+  let actualCreatedAt = new Date(post.sys.createdAt);
+  assert.equal(expectedCreatedAt.toString(), actualCreatedAt.toString());
+
+  let expectedUpdatedAt = new Date(documentHash.data.attributes.updatedAt);
+  let actualUpdatedAt = new Date(post.sys.updatedAt);
+  assert.equal(expectedUpdatedAt.toString(), actualUpdatedAt.toString());
+
+  assert.equal(documentHash.data.id, post.sys.id);
+  assert.equal(documentHash.data.type, "post");
+  assert.deepEqual(documentHash.data.relationships, {});
+  assert.equal(documentHash.included.length, 0);
+});
+
 test('normalizeQueryResponse with an item with includes', function(assert) {
 
   let id = '';
@@ -374,6 +446,88 @@ test('normalizeQueryResponse with an item with includes', function(assert) {
   assert.equal(expectedAssetUpdatedAt.toString(), actualAssetUpdatedAt.toString());
 
   assert.deepEqual(asset.relationships, {});
+
+  // Meta
+  let meta = serializer.extractMeta(this.store(), Post, payload);
+  assert.deepEqual(documentHash.meta, meta);
+});
+
+test('normalizeQueryResponse with an item w/o includes', function(assert) {
+
+  let id = '';
+  let payload = {
+    "sys": {
+      "type": "Array"
+    },
+    "total": 1,
+    "skip": 0,
+    "limit": 1,
+    "items": [
+      {
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "foobar"
+            }
+          },
+          "id": "1",
+          "type": "Entry",
+          "createdAt": "2017-02-23T21:40:37.180Z",
+          "updatedAt": "2017-02-27T21:24:26.007Z",
+          "revision": 3,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "post"
+            }
+          },
+          "locale": "en-US"
+        },
+        "fields": {
+          "title": "Example Post"
+        }
+      }
+    ]
+  };
+
+  Post = ContentfulModel.extend({
+    title: attr('string')
+  });
+
+  let serializer = this.store().serializerFor('post');
+
+  let documentHash = serializer.normalizeQueryResponse(
+    this.store(),
+    Post,
+    payload,
+    id,
+    'queryRecord'
+  );
+
+  // Items (Posts)
+  assert.equal(documentHash.data.length, 1);
+
+  let postData = documentHash.data[0];
+  assert.equal(postData.attributes.contentType, "post");
+  assert.equal(postData.attributes.title, post.fields.title);
+
+  let expectedCreatedAt = new Date(postData.attributes.createdAt);
+  let actualCreatedAt = new Date(post.sys.createdAt);
+  assert.equal(expectedCreatedAt.toString(), actualCreatedAt.toString());
+
+  let expectedUpdatedAt = new Date(postData.attributes.updatedAt);
+  let actualUpdatedAt = new Date(post.sys.updatedAt);
+  assert.equal(expectedUpdatedAt.toString(), actualUpdatedAt.toString());
+
+  assert.equal(postData.id, post.sys.id);
+  assert.equal(postData.type, "post");
+  assert.deepEqual(postData.relationships, {});
+
+  // Includes
+  assert.equal(documentHash.included.length, 0);
 
   // Meta
   let meta = serializer.extractMeta(this.store(), Post, payload);
