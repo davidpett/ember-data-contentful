@@ -21,7 +21,8 @@ moduleForModel('contentful', 'Unit | Serializer | contentful', {
 
     Post = ContentfulModel.extend({
       title: attr('string'),
-      image: belongsTo('contentful-asset')
+      image: belongsTo('contentful-asset'),
+      location: attr()
     });
 
     this.registry.register('model:post', Post);
@@ -56,6 +57,10 @@ moduleForModel('contentful', 'Unit | Serializer | contentful', {
             "linkType": "Asset",
             "id": "2"
           }
+        },
+        "location": {
+          "lon": -0.1055993,
+          "lat": 51.5109263
         }
       }
     };
@@ -184,6 +189,14 @@ test('normalize with Asset payload', function(assert) {
   let expectedAssetUpdatedAt = new Date(normalizedAsset.data.attributes.updatedAt);
   let actualAssetUpdatedAt = new Date(image.sys.updatedAt);
   assert.equal(expectedAssetUpdatedAt.toString(), actualAssetUpdatedAt.toString());
+});
+
+test('normalize with Location payload', function(assert) {
+  let serializer = this.store().serializerFor('post');
+  let resourceHash = post;
+
+  let normalizedPost = serializer.normalize(Post, resourceHash);
+  assert.equal(normalizedPost.data.attributes.location, post.fields.location);
 });
 
 test('normalizeQueryRecordResponse with empty items', function(assert) {
