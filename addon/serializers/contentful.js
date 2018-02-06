@@ -21,7 +21,7 @@ export default DS.JSONSerializer.extend({
       attributeKey = this.keyForAttribute(key, 'deserialize');
       if (fieldsHash && fieldsHash.hasOwnProperty(attributeKey)) {
         let attributeValue = fieldsHash[attributeKey];
-        if (typeOf(attributeValue) === 'object' && objHash.sys.type !== 'Asset') {
+        if (typeOf(attributeValue) === 'object' && attributeValue.sys && objHash.sys.type !== 'Asset') {
           attributeValue = attributeValue.sys.id;
         }
         attributes[key] = attributeValue;
