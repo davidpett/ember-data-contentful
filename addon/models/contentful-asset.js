@@ -3,5 +3,6 @@ import attr from 'ember-data/attr';
 
 export default Contentful.extend({
   file: attr(),
-  title: attr('string')
+  title: attr('string'),
+  description: attr('string')
 });
