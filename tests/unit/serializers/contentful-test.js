@@ -1,4 +1,4 @@
-import { test, only, moduleForModel } from 'ember-qunit';
+import { test, moduleForModel } from 'ember-qunit';
 import ContentfulModel from 'ember-data-contentful/models/contentful';
 import ContentfulAsset from 'ember-data-contentful/models/contentful-asset';
 import ContentfulAdapter from 'ember-data-contentful/adapters/contentful';
@@ -7,7 +7,7 @@ import ContentfulSerializer from 'ember-data-contentful/serializers/contentful';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'ember-data/relationships';
 
-var Post, post, image;
+let Post, post, image;
 
 
 moduleForModel('contentful', 'Unit | Serializer | contentful', {
@@ -105,7 +105,7 @@ test('returns correct serializer for Post', function(assert) {
 
   let serializer = this.store().serializerFor('post');
 
-  assert.ok(this.store().serializerFor('post') instanceof ContentfulSerializer, 'serializer returned from serializerFor is an instance of ContentfulSerializer');
+  assert.ok(serializer instanceof ContentfulSerializer, 'serializer returned from serializerFor is an instance of ContentfulSerializer');
 });
 
 test('modelNameFromPayloadType for Asset', function(assert) {

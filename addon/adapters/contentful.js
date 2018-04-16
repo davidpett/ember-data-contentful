@@ -205,7 +205,7 @@ export default DS.Adapter.extend({
     @private
   */
   _setContent() {
-    console.warn(`The Contentful Content Management API has not yet been implemented`);
+    console.warn(`The Contentful Content Management API has not yet been implemented`); /* eslint-disable-line no-console */
   },
 
   /**
@@ -242,13 +242,14 @@ export default DS.Adapter.extend({
 
     if (config.contentful.usePreviewApi || config.contentfulUsePreviewApi) {
       if (!previewAccessToken) {
-        console.warn('You have specified to use the Contentful Preview API; However, no `previewAccessToken` has been specified in config/environment.js');
+        console.warn('You have specified to use the Contentful Preview API; However, no `previewAccessToken` has been specified in config/environment.js'); /* eslint-disable-line no-console */
       } else {
         accessToken = previewAccessToken;
         api = 'preview';
       }
     }
     if (config.contentfulAccessToken || config.contentfulSpace) {
+      /* eslint-disable-next-line no-console */
       console.warn(`DEPRECATION: Use of 'contentfulAccessToken' and 'contentfulSpace' will be removed in ember-data-contentful@1.0.0. please migrate to the contentful object syntax:
       contentful: {
         accessToken: '${accessToken}',

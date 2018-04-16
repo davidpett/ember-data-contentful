@@ -1,11 +1,6 @@
 import DS from 'ember-data';
-import Ember from 'ember';
-
-const {
-  get,
-  isNone,
-  typeOf
-} = Ember;
+import { get } from '@ember/object';
+import { isNone, typeOf } from '@ember/utils';
 
 export default DS.JSONSerializer.extend({
   extractAttributes(modelClass, fieldsHash, objHash) {
@@ -13,8 +8,8 @@ export default DS.JSONSerializer.extend({
     let attributes = {};
 
     if (objHash.sys.type === 'Error') {
-      console.warn(`[Contentful] ${objHash.message}`);
-      console.warn(`[Contentful] It is possible that ${objHash.details.type}:${objHash.details.id} is not published, but is linked in this Entry.`);
+      console.warn(`[Contentful] ${objHash.message}`); /* eslint-disable-line no-console */
+      console.warn(`[Contentful] It is possible that ${objHash.details.type}:${objHash.details.id} is not published, but is linked in this Entry.`); /* eslint-disable-line no-console */
       return {};
     }
     modelClass.eachAttribute((key) => {
@@ -144,14 +139,14 @@ export default DS.JSONSerializer.extend({
     return this.normalizeArrayResponse(...arguments);
   },
 
-  normalizeSingleResponse(store, primaryModelClass, payload, id, requestType) {
+  normalizeSingleResponse(store, primaryModelClass, payload) {
     return {
       data: this.normalize(primaryModelClass, payload).data,
       included: this._extractIncludes(store, payload)
     };
   },
 
-  normalizeArrayResponse(store, primaryModelClass, payload, id, requestType) {
+  normalizeArrayResponse(store, primaryModelClass, payload) {
     return {
       data: payload.items.map((item) => {
         return this.normalize(primaryModelClass, item).data;

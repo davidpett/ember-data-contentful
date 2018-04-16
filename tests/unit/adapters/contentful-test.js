@@ -1,10 +1,10 @@
-import { test, only, moduleForModel } from 'ember-qunit';
+import { test, moduleForModel } from 'ember-qunit';
 import ContentfulModel from 'ember-data-contentful/models/contentful';
 import ContentfulAdapter from 'ember-data-contentful/adapters/contentful';
 
 import attr from 'ember-data/attr';
 
-var Post, PostAdapter;
+let Post;
 
 moduleForModel('contentful', 'Unit | Adapter | contentful', {
   beforeEach() {
