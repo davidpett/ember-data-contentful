@@ -1,14 +1,10 @@
-/* global FastBoot */
-import Ember from 'ember';
+import EmberRouter from '@ember/routing/router';
+import { inject as service } from '@ember/service';
+import { scheduleOnce } from '@ember/runloop';
+import { get } from '@ember/object';
 import config from './config/environment';
 
-const {
-  get,
-  inject: { service },
-  run: { scheduleOnce }
-} = Ember;
-
-const Router = Ember.Router.extend({
+const Router = EmberRouter.extend({
   location: config.locationType,
   rootURL: config.rootURL,
   metrics: service(),
