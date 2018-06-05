@@ -1,4 +1,4 @@
-import { test, only, moduleForModel } from 'ember-qunit';
+import { test, moduleForModel } from 'ember-qunit';
 import ContentfulModel from 'ember-data-contentful/models/contentful';
 import ContentfulAsset from 'ember-data-contentful/models/contentful-asset';
 import ContentfulAdapter from 'ember-data-contentful/adapters/contentful';
@@ -7,7 +7,7 @@ import ContentfulSerializer from 'ember-data-contentful/serializers/contentful';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'ember-data/relationships';
 
-var Post, post, image;
+let Post, post, image;
 
 
 moduleForModel('contentful', 'Unit | Serializer | contentful', {
@@ -21,7 +21,8 @@ moduleForModel('contentful', 'Unit | Serializer | contentful', {
 
     Post = ContentfulModel.extend({
       title: attr('string'),
-      image: belongsTo('contentful-asset')
+      image: belongsTo('contentful-asset'),
+      location: attr()
     });
 
     this.registry.register('model:post', Post);
@@ -56,6 +57,10 @@ moduleForModel('contentful', 'Unit | Serializer | contentful', {
             "linkType": "Asset",
             "id": "2"
           }
+        },
+        "location": {
+          "lon": -0.1055993,
+          "lat": 51.5109263
         }
       }
     };
@@ -100,7 +105,7 @@ test('returns correct serializer for Post', function(assert) {
 
   let serializer = this.store().serializerFor('post');
 
-  assert.ok(this.store().serializerFor('post') instanceof ContentfulSerializer, 'serializer returned from serializerFor is an instance of ContentfulSerializer');
+  assert.ok(serializer instanceof ContentfulSerializer, 'serializer returned from serializerFor is an instance of ContentfulSerializer');
 });
 
 test('modelNameFromPayloadType for Asset', function(assert) {
@@ -184,6 +189,14 @@ test('normalize with Asset payload', function(assert) {
   let expectedAssetUpdatedAt = new Date(normalizedAsset.data.attributes.updatedAt);
   let actualAssetUpdatedAt = new Date(image.sys.updatedAt);
   assert.equal(expectedAssetUpdatedAt.toString(), actualAssetUpdatedAt.toString());
+});
+
+test('normalize with Location payload', function(assert) {
+  let serializer = this.store().serializerFor('post');
+  let resourceHash = post;
+
+  let normalizedPost = serializer.normalize(Post, resourceHash);
+  assert.equal(normalizedPost.data.attributes.location, post.fields.location);
 });
 
 test('normalizeQueryRecordResponse with empty items', function(assert) {
