@@ -18,7 +18,8 @@ contentful: {
   space: 'YOUR-CONTENTFUL-SPACE',
   accessToken: 'YOUR-CONTENTFUL-ACCESS-TOKEN',
   previewAccessToken: 'YOUR-CONTENTFUL-PREVIEW-ACCESS-TOKEN',
-  usePreviewApi: false
+  usePreviewApi: false,
+  environment: 'master' // Optional, defaults to 'master'
 }
 ```
 
