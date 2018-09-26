@@ -182,10 +182,11 @@ export default DS.Adapter.extend({
     let {
       accessToken,
       api,
-      space
+      space,
+      environment
     } = this._getConfig();
 
-    return fetch(`https://${api}.contentful.com/spaces/${space}/${type}/${this._serializeQueryParams(data)}`, {
+    return fetch(`https://${api}.contentful.com/spaces/${space}${environment}/${type}/${this._serializeQueryParams(data)}`, {
       headers: {
         'Accept': 'application/json; charset=utf-8',
         'Authorization': `Bearer ${accessToken}`
@@ -238,6 +239,7 @@ export default DS.Adapter.extend({
     let accessToken = config.contentful ? config.contentful.accessToken : config.contentfulAccessToken;
     let api = 'cdn';
     let space = config.contentful ? config.contentful.space : config.contentfulSpace;
+    let environment = config.contentful.environment ? `/environments/${config.contentful.environment}` : '';
     let previewAccessToken = config.contentful ? config.contentful.previewAccessToken : config.contentfulPreviewAccessToken;
 
     if (config.contentful.usePreviewApi || config.contentfulUsePreviewApi) {
@@ -259,7 +261,8 @@ export default DS.Adapter.extend({
     return {
       accessToken,
       api,
-      space
+      space,
+      environment
     };
   }
 });
