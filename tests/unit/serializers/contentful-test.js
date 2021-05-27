@@ -5,7 +5,7 @@ import ContentfulAdapter from 'ember-data-contentful/adapters/contentful';
 import ContentfulSerializer from 'ember-data-contentful/serializers/contentful';
 
 import attr from 'ember-data/attr';
-import { belongsTo } from 'ember-data/relationships';
+import { belongsTo, hasMany } from 'ember-data/relationships';
 
 let Post, post, image;
 
@@ -579,4 +579,127 @@ test('extractMeta returns meta from payload', function(assert) {
     skip: 1,
     limit: 2
   });
+});
+
+test('normalizeArrayResponse with polymorphic references', function(assert) {
+
+  var Section = ContentfulModel.extend({
+    title: attr('string'),
+    sectionType: Ember.computed('contentType', function() {
+      return this.get('contentType') ? `${this.get('contentType').dasherize()}` : null;
+    })
+  });
+  this.registry.register('model:section', Section);
+
+  Post = Section.extend({
+    image: belongsTo('contentful-asset')
+  });
+  this.registry.register('model:post', Post);
+
+  var Article = Section.extend({
+    body: attr('string')
+  });
+  this.registry.register('model:article', Article);
+
+  var Page = ContentfulModel.extend({
+    title: attr('string'),
+    sections: hasMany('section')
+  });
+  this.registry.register('model:page', Page);
+
+  let page = {
+    "sys": {
+      "space": {
+        "sys": {
+          "type": "Link",
+          "linkType": "Space",
+          "id": "foobar"
+        }
+      },
+      "id": "100",
+      "type": "Entry",
+      "createdAt": "2017-04-18T04:16:59.217Z",
+      "updatedAt": "2017-04-21T01:07:48.374Z",
+      "revision": 3,
+      "contentType": {
+        "sys": {
+          "type": "Link",
+          "linkType": "ContentType",
+          "id": "page"
+        }
+      },
+      "locale": "en-US"
+    },
+    "fields": {
+      "title": "Home",
+      "sections": [
+        {
+          "sys": {
+            "type": "Link",
+            "linkType": "Entry",
+            "id": post.sys.id
+          }
+        },
+        {
+          "sys": {
+            "type": "Link",
+            "linkType": "Entry",
+            "id": "300"
+          }
+        }
+      ]
+    }
+  };
+
+  let article = {
+    "sys": {
+      "space": {
+        "sys": {
+          "type": "Link",
+          "linkType": "Space",
+          "id": "foobar"
+        }
+      },
+      "id": "300",
+      "type": "Entry",
+      "createdAt": "2017-04-18T04:15:15.716Z",
+      "updatedAt": "2017-04-18T04:15:15.716Z",
+      "revision": 1,
+      "contentType": {
+        "sys": {
+          "type": "Link",
+          "linkType": "ContentType",
+          "id": "article"
+        }
+      },
+      "locale": "en-US"
+    },
+    "fields": {
+      "title": "Example Article",
+      "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    }
+  };
+
+  let payload = {
+    "sys": {
+      "type": "Array"
+    },
+    "total": 1,
+    "skip": 0,
+    "limit": 100,
+    "items": [
+      page
+    ],
+    "includes": {
+      "Entry": [ post, article ],
+      "Asset": [ image ]
+    }
+  };
+
+
+  let serializer = this.store().serializerFor('page');
+
+  let normalized = serializer.normalizeArrayResponse(this.store(), Page, payload);
+  console.log(normalized);
+  assert.equal(true, true);
 });
